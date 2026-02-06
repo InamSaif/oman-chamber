@@ -1,0 +1,860 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+  <title>carrierarrivalreport</title>
+  <style type="text/css">
+    /* CSS Reset & Variables */
+    :root {
+      --color-black: #000000;
+      --color-white: #ffffff;
+      --font-family: Arial, sans-serif;
+
+      /* Font Sizes (approx. conversion from pt to px: 1pt = 1.33px) */
+      --fs-xxs: 8px;
+      /* ~6pt */
+      --fs-xs: 9.5px;
+      /* ~7pt */
+      --fs-sm: 10.5px;
+      /* ~8pt */
+      --fs-base: 12px;
+      /* ~9pt */
+      --fs-md: 13.5px;
+      /* ~10pt */
+      --fs-lg: 16px;
+      /* ~12pt */
+      --fs-xl: 19px;
+      /* ~14pt */
+
+      /* Spacing */
+      --spacing-1: 1.5px;
+      --spacing-2: 3px;
+      --spacing-3: 4px;
+      --spacing-4: 5.5px;
+      --spacing-5: 6.5px;
+      --spacing-6: 8px;
+      --spacing-8: 10.5px;
+      --spacing-10: 13.5px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      text-indent: 0;
+      box-sizing: border-box;
+    }
+
+    /* body {
+      background-color: var(--color-white);
+      font-family: var(--font-family);
+      color: var(--color-black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    } */
+
+    body {
+      background-color: var(--color-white);
+      font-family: var(--font-family);
+      color: var(--color-black);
+      display: block;
+    }
+
+
+    .page-wrapper {
+      /* min-height: 1020px; */
+      /* Approx A4 height minus margins at 96dpi or just slightly less than full page */
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      height: 1122px;
+      /* page-break-after: always; Handled by div structure */
+    }
+
+    .page-wrapper:last-child {
+      page-break-after: avoid;
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    /* Layout Containers */
+    .document-container {
+      width: 100%;
+      max-width: 850px;
+      background-color: #ffffff;
+      /* border: 4px solid #00A39C; */
+      border-radius: 0px;
+      /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+      font-size: 11.5px;
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+
+    /* Typography Utilities */
+    .text-left {
+      text-align: left !important;
+    }
+
+    .text-right {
+      text-align: right !important;
+    }
+
+    .text-center {
+      text-align: center !important;
+    }
+
+    .text-bold {
+      font-weight: bold !important;
+    }
+
+    .text-normal {
+      font-weight: normal !important;
+    }
+
+    .fs-xxs {
+      font-size: var(--fs-xxs);
+    }
+
+    .fs-xs {
+      font-size: var(--fs-xs);
+    }
+
+    .fs-sm {
+      font-size: var(--fs-sm);
+    }
+
+    .fs-base {
+      font-size: var(--fs-base);
+    }
+
+    .fs-md {
+      font-size: var(--fs-md);
+    }
+
+    .fs-lg {
+      font-size: var(--fs-lg);
+    }
+
+    .fs-xl {
+      font-size: var(--fs-xl);
+    }
+
+    /* Direct Conversions for Semantic Header Elements */
+    h1,
+    .h1 {
+      font-size: var(--fs-xl);
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    h2,
+    .h2 {
+      font-size: var(--fs-lg);
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    h3,
+    .h3 {
+      font-size: var(--fs-md);
+      font-weight: bold;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    /* Header Section */
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0 13px;
+      /* ~10pt */
+      margin-bottom: 5px;
+    }
+
+    .header-col {
+      flex: 1;
+    }
+
+    .header-col.center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Certificate Section */
+    .cert-section {
+      text-align: center;
+      margin: 10px 0 5px 0;
+    }
+
+    .cert-arabic {
+      font-size: var(--fs-xl);
+      margin-bottom: 7px;
+    }
+
+    .subtitle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 13px 7px 13px;
+    }
+
+    /* Introduction Text */
+    .intro-text {
+      font-size: var(--fs-md);
+      padding: 0 13px;
+      line-height: 1.4;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    /* Standard Table Styles */
+    .table-main {
+      width: calc(100% - 15px);
+      /* Margin offset */
+      margin-left: 7.5px;
+      /* ~5.5pt */
+      border-collapse: collapse;
+    }
+
+    .table-main td {
+      border: 1.3px solid black;
+      /* ~1pt */
+      vertical-align: top;
+      padding: 2px;
+    }
+
+    .td-thick-left {
+      border-left-width: 2.6px !important;
+    }
+
+    /* ~2pt */
+    .td-thick-right {
+      border-right-width: 2.6px !important;
+    }
+
+    /* Semantic Cell Classes */
+    .cell-label {
+      font-size: var(--fs-md);
+      /* s5 10pt bold */
+      font-weight: bold;
+      padding: 4px 0 0 4px;
+    }
+
+    .cell-value {
+      font-size: var(--fs-base);
+      /* s6 9pt */
+      font-weight: normal;
+      padding: 6px 0 0 4px;
+      min-height: 20px;
+    }
+
+    .cell-label-ar {
+      font-size: var(--fs-md);
+      /* 10pt */
+      text-align: right;
+      padding: 4px 0 0 4px;
+      /* padding: 5px 4px 0 0; */
+    }
+
+    .cell-value-ar {
+      font-size: var(--fs-base);
+      /* 9pt */
+      text-align: right;
+      padding: 8px 4px 0 0;
+    }
+
+    /* Specific Layout Tweaks */
+    .col-half {
+      width: 50%;
+    }
+
+    .spacer {
+      height: 5px;
+      /* Generic spacer */
+    }
+
+    .img-signature {
+      width: 100%;
+      max-width: 754px;
+      height: 1px;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: -50px;
+      left: 0;
+      width: 100%;
+    }
+
+    /* Footer Elements */
+    .footer-info {
+      padding: 0px 7.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+
+    .footer-info,
+    .footer-info * {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+
+    .printed-block {
+      margin-top: 12px;
+      display: flex;
+    }
+
+    /* Page 2 Specifics */
+    .page-break {
+      page-break-before: always;
+      height: 20px;
+      display: block;
+    }
+
+    /* Crew Table Column Widths (Fixed px to match original pt) */
+    .col-w-seq {
+      width: 40px;
+    }
+
+    /* 30pt */
+    .col-w-name {
+      width: 100px;
+    }
+
+    /* 75pt */
+    .col-w-pos {
+      width: 100px;
+    }
+
+    .col-w-nat {
+      width: 100px;
+    }
+
+    .col-w-dob {
+      width: 68px;
+    }
+
+    /* 51pt */
+    .col-w-doc {
+      width: 100px;
+    }
+
+    .col-w-iss {
+      width: 87px;
+    }
+
+    /* 65pt */
+    .col-w-exp {
+      width: 87px;
+    }
+
+    .col-w-id {
+      width: 79px;
+    }
+
+    /* 59pt */
+
+    .crew-header {
+      font-size: var(--fs-xs);
+      /* s14 7pt */
+      text-align: right;
+      padding-top: 5px;
+      padding-right: 5px;
+    }
+
+    .crew-subheader {
+      font-size: var(--fs-xxs);
+      /* s15 6pt bold */
+      font-weight: bold;
+      text-align: left;
+      padding-left: 5px;
+      padding-bottom: 2px;
+    }
+
+    .crew-cell {
+      font-size: var(--fs-sm);
+      /* s11 8pt */
+      padding: 4px;
+      vertical-align: middle;
+    }
+
+    /* Helper for RTL direction in specific blocks */
+    .rtl {
+      direction: rtl;
+      font-family: "Vazirmatn" !important;
+    }
+
+    .issuance-row td {
+      width: 33.33%;
+      text-align: center;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="document-container">
+
+    <!-- Page 1 -->
+    <div class="page-wrapper">
+      <!-- Header -->
+      <div class="header-container" style="margin-top: 20px;">
+        <div class="header-col text-left">
+          <h1 class="text-bold">SULTANATE OF OMAN</h1>
+          <h1 class="text-bold">ROYAL OMAN POLICE</h1>
+          <h1 class="header-subtitle text-bold h1">D.G. OF CUSTOMS</h1>
+        </div>
+        <div class="header-col center">
+          <img width="96" height="108" alt="Oman Coat of Arms" src="PermissionTodSailPrintArabic_files/Image_001.png" />
+        </div>
+        <div class="header-col text-right rtl">
+          <p style="font-weight: 500;" class="h1">سلطنة عمان</p>
+          <p style="font-weight: 500;" class="h1">شرطة عمان السلطانية</p>
+          <p style="font-weight: 500;" class="h1">الادارة العامة للجمارك</p>
+        </div>
+      </div>
+
+      <!-- Certificate Title -->
+      <div class="cert-section">
+        <p class="cert-arabic rtl">اذن الابحار</p>
+        <h1 class="text-bold">SAIL CERTIFICATE</h1>
+      </div>
+
+      <!-- Subtitle Row -->
+      <div class="subtitle-row">
+        <h2 class="text-left" style="border-bottom: 1.5px solid black;"> DEPARTURE CERTIFICATE</h2>
+        <h2 class="text-right rtl" style="border-bottom: 1.5px solid black; font-weight: 400;">شهادة المغادرة</h2>
+      </div>
+
+      <!-- Intro -->
+      <div class="intro-text">
+        Clearance to below mentioned Vessel. The particulars are
+        <span class="rtl">تخليص السفينة المذكورة ادناه. التفاصيل كما يلي:</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+
+        <!-- Main Info Table -->
+        <table class="table-main">
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">CERTIFICATE NUMBER</p>
+              <p class="cell-value">{{CERTIFICATE_NUMBER}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">رقم الشهادة</p>
+              <p class="cell-value-ar">{{CERTIFICATE_NUMBER}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">VESSEL NAME</p>
+              <p class="cell-value">{{VESSEL_NAME}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">اسم السفينة</p>
+              <p class="cell-value-ar rtl">{{VESSEL_NAME_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">VESSEL NATIONALITY</p>
+              <p class="cell-value">{{VESSEL_NATIONALITY}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">جنسية السفينة</p>
+              <p class="cell-value-ar rtl">{{VESSEL_NATIONALITY_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">FLAG</p>
+              <p class="cell-value">{{FLAG}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">العلم</p>
+              <p class="cell-value-ar rtl">{{FLAG_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">VESSEL AGENT NAME</p>
+              <p class="cell-value">{{VESSEL_AGENT_NAME}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">اسم وكيل السفينة</p>
+              <p class="cell-value-ar rtl">{{VESSEL_AGENT_NAME_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">PORT OF DEPARTURE</p>
+              <p class="cell-value">{{PORT_OF_DEPARTURE}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">ميناء المغادرة</p>
+              <p class="cell-value-ar rtl">{{PORT_OF_DEPARTURE_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">NEXT PORT OF CALL</p>
+              <div style="display: flex; align-items: center; ">
+                <p class="cell-value" style="font-size: var(--fs-xxs);">{{NEXT_PORT_OF_CALL}}</p>
+                <p style="padding: 10px 0 0 4px;"><img width="8" height="22" alt="arrow"
+                    src="PermissionTodSailPrintArabic_files/Image_004.png" /></p>
+              </div>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">الميناء التالي</p>
+              <div style="display: flex; align-items: center; justify-content: end; ">
+                <p style="text-align: right; padding: 10px 4px 0 0;"><img width="8" height="21" alt="arrow"
+                    src="PermissionTodSailPrintArabic_files/Image_005.png" /></p>
+                <p class="cell-value-ar rtl" style="font-size: var(--fs-xxs);">{{NEXT_PORT_OF_CALL_AR}}</p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">VOYAGE NUMBER</p>
+              <p class="cell-value">{{VOYAGE_NUMBER}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">رقم الرحلة</p>
+              <p class="cell-value-ar">{{VOYAGE_NUMBER}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">CAPTAIN NAME</p>
+              <p class="cell-value">{{CAPTAIN_NAME}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">اسم القبطان</p>
+              <p class="cell-value-ar rtl">{{CAPTAIN_NAME_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">ESTIMATED TIME OF DEPARTURE</p>
+              <p class="cell-value">{{ETD}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">الزمن المتوقع للمغادرة</p>
+              <p class="cell-value-ar">{{ETD}}</p>
+            </td>
+          </tr>
+        </table>
+
+        <div class="spacer"></div>
+
+        <!-- Approvals Table -->
+        <table class="table-main">
+          <!-- Header Row -->
+          <tr>
+            <td style="width: 172px;">
+              <p class="cell-label-ar text-center rtl">الموظف / الجهة المسؤولة</p>
+              <br />
+              <p class="cell-label">OFFICER / AUTHORITY</p>
+            </td>
+            <td style="width: 140px;">
+              <p class="cell-label-ar text-center rtl">حالة المراجعة</p>
+              <br />
+              <p class="text-bold text-center" style="font-size: var(--fs-lg);">REVIEW STATUS</p>
+            </td>
+            <td>
+              <p class="cell-label-ar text-center rtl">ملاحظات</p>
+              <br />
+              <p class="text-bold text-center" style="font-size: var(--fs-lg);">REMARKS</p>
+            </td>
+          </tr>
+
+          <!-- Port Authority -->
+          <tr>
+            <td style="height: 35px;">
+              <p class="cell-label-ar text-left rtl">سلطة الميناء</p>
+              <p class="cell-label">PORT AUTHORITY</p>
+            </td>
+            <td style="padding: 0 !important;">
+              <p class="cell-label-ar text-center rtl" style="border-bottom: 1px solid #000;">مقبول</p>
+              <p class="text-bold text-left" style="padding: 10px 0 0 40px; font-size: var(--fs-sm);">APPROVED</p>
+            </td>
+            <td></td>
+          </tr>
+
+          <!-- Coast Guard -->
+          <tr>
+            <td style="height: 35px;">
+              <p class="cell-label-ar text-left rtl">موظف خفر السواحل</p>
+              <p class="cell-label">COAST GUARD</p>
+            </td>
+            <td style="padding: 0 !important;">
+              <p class="cell-label-ar text-center rtl" style="border-bottom: 1px solid #000;">مقبول</p>
+              <p class="text-bold text-left" style="padding: 10px 0 0 40px; font-size: var(--fs-sm);">APPROVED</p>
+            </td>
+            <td></td>
+          </tr>
+
+          <!-- Passport Officer -->
+          <tr>
+            <td style="height: 35px;">
+              <p class="cell-label-ar text-left rtl">موظف الجوازات</p>
+              <p class="cell-label">PASSPORT OFFICER</p>
+            </td>
+            <td style="padding: 0 !important;">
+              <p class="cell-label-ar text-center rtl" style="border-bottom: 1px solid #000;">مقبول</p>
+              <p class="text-bold text-left" style="padding: 10px 0 0 40px; font-size: var(--fs-sm);">APPROVED</p>
+            </td>
+            <td></td>
+          </tr>
+
+          <!-- Customs Officer -->
+          <tr>
+            <td style="height: 35px;">
+              <p class="cell-label-ar text-left rtl">موظف الجمارك</p>
+              <p class="cell-label">CUSTOMS OFFICER</p>
+            </td>
+            <td style="padding: 0 !important;">
+              <p class="cell-label-ar text-center rtl" style="border-bottom: 1px solid #000;">مقبول</p>
+              <p class="text-bold text-left" style="padding: 10px 0 0 40px; font-size: var(--fs-sm);">APPROVED</p>
+            </td>
+            <td>
+              <p class="fs-xs" style="padding: 5px;">{{CUSTOMS_REMARKS}}</p>
+            </td>
+          </tr>
+
+          <!-- Issuance Date -->
+
+        </table>
+        <table class="table-main" style="border-top: none !important;">
+          <tr class="issuance-row">
+            <td>
+              <p class="cell-label" style="text-align: left;">ISSUANCE DATE</p>
+            </td>
+
+            <td>
+              <p class="cell-value">{{ISSUANCE_DATE}}</p>
+            </td>
+
+            <td>
+              <p class="rtl">تاريخ الإصدار</p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Flex Spacer for Page 1 -->
+        <div style="margin-top: 30px;">
+          <div class="footer-info">
+            <!-- <div class="printed-block"> -->
+            <h3>Printed on:</h3>
+            <h3>{{PRINTED_ON}}</h3>
+            <!-- </div> -->
+
+            <!-- <div class="printed-block"> -->
+            <h3>Computer Generated Report No Signature Required</h3>
+            <h3>{{PRINTED_ON}}</h3>
+            <p class="text-right rtl" style="font-size: var(--fs-base);">تم الطباعة بتاريخ:</p>
+            <!-- </div> -->
+
+            <!-- <img class="img-signature" src="PermissionTodSailPrintArabic_files/Image_006.png" alt="line" /> -->
+          </div>
+          <div style="border-bottom: 1px solid #000; margin: 0px 7.5px 5px 7.5px;"></div>
+          <div class="footer-info">
+            <span style="font-size: var(--fs-base);"><strong>Page</strong> 1 of 2</span>
+            <span style="font-size: var(--fs-md);" class="rtl">صفحة 1 من 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page-break"></div>
+
+    <!-- Reuse Same Header Logic -->
+    <div class="page-wrapper">
+      <div class="header-container">
+        <div class="header-col text-left">
+          <h1 class="text-bold">SULTANATE OF OMAN</h1>
+          <h1 class="text-bold">ROYAL OMAN POLICE</h1>
+          <h1 class="header-subtitle text-bold h1">D.G. OF CUSTOMS</h1>
+        </div>
+        <div class="header-col center">
+          <img width="96" height="108" alt="Oman Coat of Arms" src="PermissionTodSailPrintArabic_files/Image_007.png" />
+        </div>
+        <div class="header-col text-right rtl">
+          <p style="font-weight: 500;" class="h1">سلطنة عمان</p>
+          <p style="font-weight: 500;" class="h1">شرطة عمان السلطانية</p>
+          <p style="font-weight: 500;" class="h1">الادارة العامة للجمارك</p>
+        </div>
+      </div>
+
+      <div class="cert-section" style="margin-bottom: 0 !important;">
+        <p class="cert-arabic rtl">اذن الابحار</p>
+        <h1 class="text-center text-bold">SAIL CERTIFICATE</h1>
+        <div class="footer-info">
+          <h2 class="text-center text-bold" style="text-decoration: underline;">IMO CREW LIST </h2>
+          <span class="fs-lg rtl" style="text-decoration: underline;">الطاقم</span>
+        </div>
+      </div>
+
+      <!-- <img src="PermissionTodSailPrintArabic_files/Image_008.png" width="42" height="1"
+      style="display:block; margin: 10px auto;" /> -->
+
+      <div>
+        <!-- Minimal Table for header details on pg 2 -->
+        <table class="table-main" style="margin-bottom: 20px;">
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">CERTIFICATE NUMBER</p>
+              <p class="cell-value">{{CERTIFICATE_NUMBER}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">رقم الشهادة</p>
+              <p class="cell-value-ar">{{CERTIFICATE_NUMBER}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">VESSEL NAME</p>
+              <p class="cell-value">{{VESSEL_NAME}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">اسم السفينة</p>
+              <p class="cell-value-ar rtl">{{VESSEL_NAME_AR}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="col-half">
+              <p class="cell-label">IMO NUMBER</p>
+              <p class="cell-value">{{IMO_NUMBER}}</p>
+            </td>
+            <td class="col-half">
+              <p class="cell-label-ar rtl">رقم المنظمة البحرية الدولية</p>
+              <p class="cell-value-ar">{{IMO_NUMBER}}</p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Crew Table -->
+        <table class="table-main">
+          <thead>
+            <tr>
+              <td class="col-w-seq">
+                <p class="crew-header rtl text-center">تسلسل</p>
+                <p class="crew-subheader">SEQ NO.</p>
+              </td>
+              <td class="col-w-name">
+                <p class="crew-header rtl text-center">الاسم</p>
+                <p class="crew-subheader text-center">NAME</p>
+              </td>
+              <td class="col-w-pos">
+                <p class="crew-header rtl text-center">المنصب</p>
+                <p class="crew-subheader text-center">POSITION</p>
+              </td>
+              <td class="col-w-nat">
+                <p class="crew-header rtl text-center">الجنسية</p>
+                <p class="crew-subheader text-center">NATIONALITY</p>
+              </td>
+              <td class="col-w-dob">
+                <p class="crew-header rtl text-center">تاريخ الميلاد</p>
+                <p class="crew-subheader">DATE OF BIRTH</p>
+              </td>
+              <td class="col-w-doc td-thick-right">
+                <p class="crew-header rtl text-center">رقم وثيقة السفر</p>
+                <p class="crew-subheader">TRAVEL DOC REF NO.</p>
+              </td>
+              <td class="col-w-iss td-thick-right td-thick-left">
+                <p class="crew-header rtl text-center">تاريخ الاصدار</p>
+                <p class="crew-subheader text-center">DATE OF ISSUE</p>
+              </td>
+              <td class="col-w-exp td-thick-right td-thick-left">
+                <p class="crew-header rtl text-center">تاريخ الانتهاء</p>
+                <p class="crew-subheader text-center">DATE OF EXPIRY</p>
+              </td>
+              <td class="col-w-id td-thick-left">
+                <p class="crew-header rtl">رقم الهوية (البحرية)</p>
+                <p class="crew-subheader">SEAMAN BOOK</p>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {{CREW_MEMBERS}}
+          </tbody>
+        </table>
+        <div class="footer-info"
+          style="align-items: center; margin: 20px auto 0; width: 800px; justify-content: space-between;">
+          <img src="{{QR_CODE_URL}}" id="qr-code-img" style="width: 100px; height: 100px;" />
+          <div>
+            <p class="text-center rtl fs-sm" style="margin-top: 5px;">للتحقق من الوثيقة يرجى مسح رمز الاستجابة السريع
+              للاطلاع
+              على الوثيقة الأصلية من نظام بيان</p>
+            <p class="text-center fs-sm">For verifying this document, please scan the QR code to view Original
+              Document
+              on
+              Bayan system</p>
+          </div>
+          <img src="assets/arabianlogo2.jpg" style="object-fit: cover;" />
+        </div>
+
+        <div class="footer">
+          <div class="footer-info" style="align-items: center; display: none; ">
+            <img src="{{QR_CODE_URL}}" id="qr-code-img" style="width: 100px; height: 100px;" />
+            <div style="flex-grow: 1;">
+              <p class="text-center rtl fs-sm" style="margin-top: 5px;">للتحقق من الوثيقة يرجى مسح رمز الاستجابة السريع
+                للاطلاع
+                على الوثيقة الأصلية من نظام بيان</p>
+              <p class="text-center fs-sm">For verifying this document, please scan the QR code to view Original
+                Document
+                on
+                Bayan system</p>
+            </div>
+            <img src="assets/arabianlogo2.jpg" style="object-fit: cover;" />
+          </div>
+          <div class="footer-info">
+            <!-- <div class="printed-block"> -->
+            <h3>Printed on:</h3>
+            <h3>{{PRINTED_ON}}</h3>
+            <!-- </div> -->
+
+            <!-- <div class="printed-block"> -->
+            <h3>Computer Generated Report No Signature Required</h3>
+            <h3>{{PRINTED_ON}}</h3>
+            <p class="text-right rtl" style="font-size: var(--fs-base);">تم الطباعة بتاريخ:</p>
+            <!-- </div> -->
+
+            <!-- <img class="img-signature" src="PermissionTodSailPrintArabic_files/Image_006.png" alt="line" /> -->
+          </div>
+          <div style="border-bottom: 1px solid #000; margin: 0px 7.5px 5px 7.5px;"></div>
+          <div class="footer-info">
+            <span style="font-size: var(--fs-base);"><strong>Page</strong> 2 of 2</span>
+            <span style="font-size: var(--fs-md); font-weight: 400;" class="rtl">صفحة 2 من 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

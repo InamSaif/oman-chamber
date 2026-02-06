@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Engine - API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00A39C 0%, #008B84 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00A39C;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00A39C 0%, #008B84 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 163, 156, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            background: #f0f9f8;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #00A39C;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-section h3 {
+            color: #00A39C;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .result-item strong {
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .result-item a {
+            color: #00A39C;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00A39C;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            border: 2px solid #f88;
+            color: #c33;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .quick-fill {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffc107;
+        }
+
+        .quick-fill button {
+            background: #ffc107;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .quick-fill button:hover {
+            background: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚢 QR Engine API Tester</h1>
+            <p>Port Clearance PDF Generator with Dynamic QR Codes</p>
+        </div>
+
+        <div class="content">
+            <div class="quick-fill">
+                <p style="margin-bottom: 10px;"><strong>Quick Start:</strong> Click below to fill form with sample data</p>
+                <button onclick="fillSampleData()">📝 Fill Sample Data</button>
+            </div>
+
+            <div class="form-section">
+                <h2>Port Clearance Details</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Marine Affairs No. (EN)</label>
+                        <input type="text" id="MARINE_AFFAIRS_NO" placeholder="MA-2024-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Marine Affairs No. (FA)</label>
+                        <input type="text" id="MARINE_AFFAIRS_NO_FA" placeholder="۰۰۱-۲۰۲۴-MA">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Serial No. (EN) *</label>
+                        <input type="text" id="SERIAL_NO" placeholder="PC-12345" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Serial No. (FA)</label>
+                        <input type="text" id="SERIAL_NO_FA" placeholder="۱۲۳۴۵-PC">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Issue Date & Time (EN)</label>
+                        <input type="text" id="ISSUE_DATE_TIME" placeholder="2024-10-16 14:30">
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Date & Time (FA)</label>
+                        <input type="text" id="ISSUE_DATE_TIME_FA" placeholder="۱۴۰۳/۰۷/۲۵ ۱۴:۳۰">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Port Clearance No. (EN)</label>
+                        <input type="text" id="PORT_CLEARANCE_NO" placeholder="PCN-2024-5678">
+                    </div>
+                    <div class="form-group">
+                        <label>Port Clearance No. (FA)</label>
+                        <input type="text" id="PORT_CLEARANCE_NO_FA" placeholder="۵۶۷۸-۲۰۲۴-PCN">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Custom Leave No. (EN)</label>
+                        <input type="text" id="CUSTOM_LEAVE_NO" placeholder="CL-9876">
+                    </div>
+                    <div class="form-group">
+                        <label>Custom Leave No. (FA)</label>
+                        <input type="text" id="CUSTOM_LEAVE_NO_FA" placeholder="۹۸۷۶-CL">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Agent (EN)</label>
+                        <input type="text" id="AGENT" placeholder="Maritime Services Co.">
+                    </div>
+                    <div class="form-group">
+                        <label>Agent (FA)</label>
+                        <input type="text" id="AGENT_FA" placeholder="شرکت خدمات دریایی">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vessel Name (EN)</label>
+                        <input type="text" id="VESSEL_NAME" placeholder="MV Ocean Star">
+                    </div>
+                    <div class="form-group">
+                        <label>Vessel Name (FA)</label>
+                        <input type="text" id="VESSEL_NAME_FA" placeholder="ستاره اقیانوس">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Arrived From (EN)</label>
+                        <input type="text" id="ARRIVED_FROM" placeholder="Dubai Port">
+                    </div>
+                    <div class="form-group">
+                        <label>Arrived From (FA)</label>
+                        <input type="text" id="ARRIVED_FROM_FA" placeholder="بندر دبی">
+                    </div>
+
+                    <div class="form-group">
+                        <label>On Date (EN)</label>
+                        <input type="text" id="ON_DATE" placeholder="2024-10-15">
+                    </div>
+                    <div class="form-group">
+                        <label>On Date (FA)</label>
+                        <input type="text" id="ON_DATE_FA" placeholder="۱۴۰۳/۰۷/۲۴">
+                    </div>
+
+                    <div class="form-group">
+                        <label>IMO No. (EN)</label>
+                        <input type="text" id="IMO_NO" placeholder="IMO 9234567">
+                    </div>
+                    <div class="form-group">
+                        <label>IMO No. (FA)</label>
+                        <input type="text" id="IMO_NO_FA" placeholder="۹۲۳۴۵۶۷ IMO">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ship's Flag (EN)</label>
+                        <input type="text" id="SHIPS_FLAG" placeholder="Panama">
+                    </div>
+                    <div class="form-group">
+                        <label>Ship's Flag (FA)</label>
+                        <input type="text" id="SHIPS_FLAG_FA" placeholder="پاناما">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Registry Port (EN)</label>
+                        <input type="text" id="REGISTRY_PORT" placeholder="Panama City">
+                    </div>
+                    <div class="form-group">
+                        <label>Registry Port (FA)</label>
+                        <input type="text" id="REGISTRY_PORT_FA" placeholder="پاناما سیتی">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gross Tonnage (EN)</label>
+                        <input type="text" id="GROSS_TONNAGE" placeholder="45000 GT">
+                    </div>
+                    <div class="form-group">
+                        <label>Gross Tonnage (FA)</label>
+                        <input type="text" id="GROSS_TONNAGE_FA" placeholder="۴۵۰۰۰ تن">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Master (EN)</label>
+                        <input type="text" id="MASTER" placeholder="Captain John Smith">
+                    </div>
+                    <div class="form-group">
+                        <label>Master (FA)</label>
+                        <input type="text" id="MASTER_FA" placeholder="کاپیتان جان اسمیت">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Permitted to Sail (EN)</label>
+                        <input type="text" id="PERMITTED_TO_SAIL" placeholder="Bandar Abbas">
+                    </div>
+                    <div class="form-group">
+                        <label>Permitted to Sail (FA)</label>
+                        <input type="text" id="PERMITTED_TO_SAIL_FA" placeholder="بندر عباس">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Head of Maritime (EN)</label>
+                        <input type="text" id="HEAD_OF_MARITIME" placeholder="Ali Rezaei">
+                    </div>
+                    <div class="form-group">
+                        <label>Head of Maritime (FA)</label>
+                        <input type="text" id="HEAD_OF_MARITIME_FA" placeholder="علی رضایی">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Port (EN)</label>
+                        <input type="text" id="PORT" placeholder="Khorramshahr">
+                    </div>
+                    <div class="form-group">
+                        <label>Port (FA)</label>
+                        <input type="text" id="PORT_FA" placeholder="خرمشهر">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Signature (EN)</label>
+                        <input type="text" id="SIGNATURE" placeholder="Digitally Signed">
+                    </div>
+                    <div class="form-group">
+                        <label>Signature (FA)</label>
+                        <input type="text" id="SIGNATURE_FA" placeholder="امضا شده دیجیتال">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="generatePDF()">🚀 Generate Port Clearance PDF</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating PDF with dynamic QR code...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="result-section" id="result">
+                <h3>✅ PDF Generated Successfully!</h3>
+                <div class="result-item">
+                    <strong>Filename:</strong>
+                    <span id="result-filename"></span>
+                </div>
+                <div class="result-item">
+                    <strong>View PDF:</strong>
+                    <a id="result-pdf-url" href="#" target="_blank"></a>
+                </div>
+                <div class="result-item">
+                    <strong>Download PDF:</strong>
+                    <a id="result-download-url" href="#" target="_blank"></a>
+                </div>
+                <button class="btn" onclick="window.open(document.getElementById('result-pdf-url').href, '_blank')">
+                    📄 Open PDF in New Tab
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/generate-port-clearance';
+
+        function fillSampleData() {
+            const sampleData = {
+                MARINE_AFFAIRS_NO: 'MA-2024-001',
+                MARINE_AFFAIRS_NO_FA: '۰۰۱-۲۰۲۴-MA',
+                SERIAL_NO: 'PC-12345',
+                SERIAL_NO_FA: '۱۲۳۴۵-PC',
+                ISSUE_DATE_TIME: '2024-10-16 14:30',
+                ISSUE_DATE_TIME_FA: '۱۴۰۳/۰۷/۲۵ ۱۴:۳۰',
+                PORT_CLEARANCE_NO: 'PCN-2024-5678',
+                PORT_CLEARANCE_NO_FA: '۵۶۷۸-۲۰۲۴-PCN',
+                CUSTOM_LEAVE_NO: 'CL-9876',
+                CUSTOM_LEAVE_NO_FA: '۹۸۷۶-CL',
+                AGENT: 'Maritime Services Co.',
+                AGENT_FA: 'شرکت خدمات دریایی',
+                VESSEL_NAME: 'MV Ocean Star',
+                VESSEL_NAME_FA: 'ستاره اقیانوس',
+                ARRIVED_FROM: 'Dubai Port',
+                ARRIVED_FROM_FA: 'بندر دبی',
+                ON_DATE: '2024-10-15',
+                ON_DATE_FA: '۱۴۰۳/۰۷/۲۴',
+                IMO_NO: 'IMO 9234567',
+                IMO_NO_FA: '۹۲۳۴۵۶۷ IMO',
+                SHIPS_FLAG: 'Panama',
+                SHIPS_FLAG_FA: 'پاناما',
+                REGISTRY_PORT: 'Panama City',
+                REGISTRY_PORT_FA: 'پاناما سیتی',
+                GROSS_TONNAGE: '45000 GT',
+                GROSS_TONNAGE_FA: '۴۵۰۰۰ تن',
+                MASTER: 'Captain John Smith',
+                MASTER_FA: 'کاپیتان جان اسمیت',
+                PERMITTED_TO_SAIL: 'Bandar Abbas',
+                PERMITTED_TO_SAIL_FA: 'بندر عباس',
+                HEAD_OF_MARITIME: 'Ali Rezaei',
+                HEAD_OF_MARITIME_FA: 'علی رضایی',
+                PORT: 'Khorramshahr',
+                PORT_FA: 'خرمشهر',
+                SIGNATURE: 'Digitally Signed',
+                SIGNATURE_FA: 'امضا شده دیجیتال'
+            };
+
+            for (const [key, value] of Object.entries(sampleData)) {
+                const input = document.getElementById(key);
+                if (input) input.value = value;
+            }
+
+            alert('✅ Sample data filled! Click "Generate Port Clearance PDF" to continue.');
+        }
+
+        async function generatePDF() {
+            const formData = {};
+            const inputs = document.querySelectorAll('.form-group input');
+            
+            inputs.forEach(input => {
+                formData[input.id] = input.value;
+            });
+
+            // Validate required field
+            if (!formData.SERIAL_NO) {
+                alert('⚠️ Serial No. is required!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show result
+                    document.getElementById('result-filename').textContent = data.data.filename;
+                    document.getElementById('result-pdf-url').href = data.data.pdfUrl;
+                    document.getElementById('result-pdf-url').textContent = data.data.pdfUrl;
+                    document.getElementById('result-download-url').href = data.data.downloadUrl;
+                    document.getElementById('result-download-url').textContent = data.data.downloadUrl;
+                    document.getElementById('result').classList.add('show');
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = '❌ Error: ' + error.message;
+                errorDiv.classList.add('show');
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
+

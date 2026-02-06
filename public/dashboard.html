@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QR Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3CB371',
+                        secondary: '#7FFFD4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-800">QR Engine</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">Welcome, <span id="userName"
+                            class="font-semibold"></span></span>
+                    <button onclick="logout()"
+                        class="text-sm text-red-600 hover:text-red-800 font-medium">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Port Clearance Documents</h1>
+            <p class="mt-2 text-gray-600">Manage and generate port clearance PDFs with dynamic QR codes</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500">Active Documents</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="activeCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500">Expired Documents</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="expiredCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5">
+                        <p class="text-sm font-medium text-gray-500">Total Documents</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="totalCount">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mb-6 flex justify-between items-center">
+            <button onclick="showCreateForm()"
+                class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Create New Document
+            </button>
+            <button onclick="loadDocuments()" class="text-primary hover:text-secondary font-medium flex items-center">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Your Documents</h2>
+            </div>
+            <div id="documentsContainer" class="overflow-x-auto">
+                <div class="flex items-center justify-center py-12">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading documents...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Document Modal -->
+    <div id="documentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-6xl shadow-lg rounded-md bg-white mb-20">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Create New Document</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="documentForm" class="space-y-6">
+                <input type="hidden" id="documentId">
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                    <p class="text-sm text-yellow-800">
+                        <strong>Quick Start:</strong> Fill in the fields below to generate your Sail Certificate PDF.
+                    </p>
+                </div>
+
+                <!-- Sail Certificate Fields -->
+                <div class="rounded-lg mt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Sail Certificate Information</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Certificate Number -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Certificate Number</label>
+                            <input type="text" id="CERTIFICATE_NUMBER"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="PTS220925322532">
+                        </div>
+
+                        <!-- Vessel Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Name (EN)</label>
+                            <input type="text" id="VESSEL_NAME"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="HAMDAN AB">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Name (AR)</label>
+                            <input type="text" id="VESSEL_NAME_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="حمدان">
+                        </div>
+
+                        <!-- Vessel Nationality -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Nationality (EN)</label>
+                            <input type="text" id="VESSEL_NATIONALITY"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="PANAMA">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Nationality (AR)</label>
+                            <input type="text" id="VESSEL_NATIONALITY_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="بنما">
+                        </div>
+
+                        <!-- Flag -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Flag (EN)</label>
+                            <input type="text" id="FLAG"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="PANAMA">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Flag (AR)</label>
+                            <input type="text" id="FLAG_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="بنما">
+                        </div>
+
+                        <!-- Vessel Agent Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Agent Name (EN)</label>
+                            <input type="text" id="VESSEL_AGENT_NAME"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Arabian Sea Petroleum">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vessel Agent Name (AR)</label>
+                            <input type="text" id="VESSEL_AGENT_NAME_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="بحر العرب للبترول">
+                        </div>
+
+                        <!-- Port of Departure -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Port of Departure (EN)</label>
+                            <input type="text" id="PORT_OF_DEPARTURE"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Shinas Port">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Port of Departure (AR)</label>
+                            <input type="text" id="PORT_OF_DEPARTURE_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="ميناء شناص">
+                        </div>
+
+                        <!-- Next Port of Call -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Next Port of Call (EN)</label>
+                            <input type="text" id="NEXT_PORT_OF_CALL"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Ajman">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Next Port of Call (AR)</label>
+                            <input type="text" id="NEXT_PORT_OF_CALL_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="ميناء صحار وجمّان">
+                        </div>
+
+                        <!-- Voyage Number -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Voyage Number</label>
+                            <input type="text" id="VOYAGE_NUMBER"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="25831">
+                        </div>
+
+                        <!-- Captain Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Captain Name (EN)</label>
+                            <input type="text" id="CAPTAIN_NAME"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Muhammad Asif">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Captain Name (AR)</label>
+                            <input type="text" id="CAPTAIN_NAME_AR" dir="rtl"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="محمد اصيف">
+                        </div>
+
+                        <!-- ETD -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Estimated Time of
+                                Departure</label>
+                            <input type="text" id="ETD"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="22/09/2025 13:00">
+                        </div>
+
+                        <!-- IMO Number -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">IMO Number</label>
+                            <input type="text" id="IMO_NUMBER"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="9331103">
+                        </div>
+
+                        <!-- Issuance Date -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Issuance Date</label>
+                            <input type="text" id="ISSUANCE_DATE"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="22/09/2025 01:30">
+                        </div>
+                    </div>
+
+                    <!-- Customs Remarks -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Customs Remarks</label>
+                        <textarea id="CUSTOMS_REMARKS" rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="This ship has carried out a food supply operation at sea..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Crew Members Section -->
+                <div class="rounded-lg mt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Crew Members</h3>
+                        <button type="button" onclick="addCrewMember()"
+                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm">
+                            + Add Crew Member
+                        </button>
+                    </div>
+                    <div id="crewMembersContainer" class="space-y-4">
+                        <!-- Crew members will be added here dynamically -->
+                        <p class="text-sm text-gray-600 text-center py-4">No crew members added yet. Click "Add Crew
+                            Member" to start.</p>
+                    </div>
+                </div>
+
+                <!-- Legacy fields removed -->
+
+
+
+                <!-- Expiration Date (Optional) -->
+                <!-- Expiration Date -->
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Document Expiration (Optional)</label>
+                    <input type="datetime-local" id="expiresAt"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <p class="mt-1 text-xs text-gray-500">Leave empty for no expiration. QR code will stop working after
+                        this date.</p>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex justify-end space-x-4 pt-4 border-t">
+                    <button type="button" onclick="closeModal()"
+                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" id="submitBtn"
+                        class="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:shadow-lg">
+                        <span id="btnText">Create Document</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/dashboard.js"></script>
+</body>
+
+</html>
