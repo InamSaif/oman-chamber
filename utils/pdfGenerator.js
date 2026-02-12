@@ -158,19 +158,26 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
  */
 async function embedAllImages(html, baseDir) {
     let updatedHtml = html;
-    // Regex to find img tags with src attribute
-    // Capture group 1: the full src attribute value
+    
+    // 1. Handle img tags with src attribute
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     
     let match;
-    // We need to collect matches first to avoid infinite loops if we replace them
-    const matches = [];
+    const imgMatches = [];
     while ((match = imgRegex.exec(html)) !== null) {
-        matches.push(match[1]);
+        imgMatches.push(match[1]);
     }
     
-    // Process unique matches
-    const uniqueSources = [...new Set(matches)];
+    // 2. Handle CSS url() declarations
+    const cssUrlRegex = /url\(['"]?([^'")]+)['"]?\)/g;
+    const cssMatches = [];
+    while ((match = cssUrlRegex.exec(html)) !== null) {
+        cssMatches.push(match[1]);
+    }
+    
+    // Combine and process unique matches
+    const allMatches = [...imgMatches, ...cssMatches];
+    const uniqueSources = [...new Set(allMatches)];
     
     for (const src of uniqueSources) {
         // Skip if already base64 or remote URL
@@ -202,9 +209,14 @@ async function embedAllImages(html, baseDir) {
             const base64Data = imgBuffer.toString('base64');
             const dataUri = `data:${mimeType};base64,${base64Data}`;
             
-            // Replace all occurrences in HTML
-            // global replacement
+            // Replace in img src attributes
             updatedHtml = updatedHtml.split(`src="${src}"`).join(`src="${dataUri}"`);
+            
+            // Replace in CSS url() declarations (with and without quotes)
+            updatedHtml = updatedHtml.split(`url('${src}')`).join(`url('${dataUri}')`);
+            updatedHtml = updatedHtml.split(`url("${src}")`).join(`url("${dataUri}")`);
+            updatedHtml = updatedHtml.split(`url(${src})`).join(`url(${dataUri})`);
+            
             console.log(`Embedded image: ${src}`);
             
         } catch (error) {
