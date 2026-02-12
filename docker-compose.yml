@@ -4,29 +4,29 @@ services:
   # MongoDB Database
   mongodb:
     image: mongo:7.0
-    container_name: qr-engine-2-mongodb
+    container_name: omanchamber-mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
-      MONGO_INITDB_DATABASE: qr-engine
+      MONGO_INITDB_DATABASE: omanchamber
     ports:
       - "27019:27017"
     volumes:
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
+      - omanchamber_mongodb_data:/data/db
+      - omanchamber_mongodb_config:/data/configdb
     networks:
-      - qr-engine-network
+      - omanchamber-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/qr-engine --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/omanchamber --quiet
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # QR Engine Application
+  # Oman Chamber Application
   app:
     build: .
-    container_name: qr-engine-2-app
+    container_name: omanchamber-app
     restart: unless-stopped
     ports:
       - "3005:3000"
@@ -34,7 +34,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - BASE_URL=${DOCKER_HOST_IP:-http://localhost:3005}
-      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/qr-engine?authSource=admin
+      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/omanchamber?authSource=admin
       - JWT_SECRET=your-super-secret-jwt-key-change-in-production-now
       - JWT_EXPIRE=30d
     volumes:
@@ -44,7 +44,7 @@ services:
       mongodb:
         condition: service_healthy
     networks:
-      - qr-engine-network
+      - omanchamber-network
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
       interval: 30s
@@ -55,7 +55,7 @@ services:
   # Mongo Express (Optional - Database Admin UI)
   mongo-express:
     image: mongo-express:latest
-    container_name: qr-engine-2-mongo-express
+    container_name: omanchamber-mongo-express
     restart: unless-stopped
     ports:
       - "8083:8081"
@@ -68,15 +68,15 @@ services:
     depends_on:
       - mongodb
     networks:
-      - qr-engine-network
+      - omanchamber-network
 
 volumes:
-  mongodb_data:
+  omanchamber_mongodb_data:
     driver: local
-  mongodb_config:
+  omanchamber_mongodb_config:
     driver: local
 
 networks:
-  qr-engine-network:
+  omanchamber-network:
     driver: bridge
 
