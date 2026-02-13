@@ -24,63 +24,32 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
 
     // Replace all placeholders with actual data
     const placeholders = {
-        // Sail Certificate specific fields
-        'CERTIFICATE_NUMBER': formData.CERTIFICATE_NUMBER || '',
-        'VESSEL_NAME': formData.VESSEL_NAME || '',
-        'VESSEL_NAME_AR': formData.VESSEL_NAME_AR || '',
-        'VESSEL_NATIONALITY': formData.VESSEL_NATIONALITY || '',
-        'VESSEL_NATIONALITY_AR': formData.VESSEL_NATIONALITY_AR || '',
-        'FLAG': formData.FLAG || '',
-        'FLAG_AR': formData.FLAG_AR || '',
-        'VESSEL_AGENT_NAME': formData.VESSEL_AGENT_NAME || '',
-        'VESSEL_AGENT_NAME_AR': formData.VESSEL_AGENT_NAME_AR || '',
-        'PORT_OF_DEPARTURE': formData.PORT_OF_DEPARTURE || '',
-        'PORT_OF_DEPARTURE_AR': formData.PORT_OF_DEPARTURE_AR || '',
-        'NEXT_PORT_OF_CALL': formData.NEXT_PORT_OF_CALL || '',
-        'NEXT_PORT_OF_CALL_AR': formData.NEXT_PORT_OF_CALL_AR || '',
-        'VOYAGE_NUMBER': formData.VOYAGE_NUMBER || '',
-        'CAPTAIN_NAME': formData.CAPTAIN_NAME || '',
-        'CAPTAIN_NAME_AR': formData.CAPTAIN_NAME_AR || '',
-        'ETD': formData.ETD || '',
-        'CUSTOMS_REMARKS': formData.CUSTOMS_REMARKS || '',
-        'ISSUANCE_DATE': formData.ISSUANCE_DATE || '',
-        'PRINTED_ON': formData.PRINTED_ON || printedOn,
-        'IMO_NUMBER': formData.IMO_NUMBER || '',
+        // Chamber of Commerce Certificate fields
+        'EXPORTER_COMPANY': formData.EXPORTER_COMPANY || '',
+        'EXPORTER_ADDRESS': formData.EXPORTER_ADDRESS || '',
+        'EXPORTER_POBOX': formData.EXPORTER_POBOX || '',
+        'EXPORTER_EMAIL': formData.EXPORTER_EMAIL || '',
         
-        // Legacy fields (kept for backward compatibility)
-        'MARINE_AFFAIRS_NO': formData.MARINE_AFFAIRS_NO || '',
-        'MARINE_AFFAIRS_NO_FA': formData.MARINE_AFFAIRS_NO_FA || '',
-        'SERIAL_NO': formData.SERIAL_NO || '',
-        'SERIAL_NO_FA': formData.SERIAL_NO_FA || '',
-        'ISSUE_DATE_TIME': formData.ISSUE_DATE_TIME ? new Date(formData.ISSUE_DATE_TIME).toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) : '',
-        'ISSUE_DATE_TIME_FA': formData.ISSUE_DATE_TIME_FA || '',
-        'PORT_CLEARANCE_NO': formData.PORT_CLEARANCE_NO || '',
-        'PORT_CLEARANCE_NO_FA': formData.PORT_CLEARANCE_NO_FA || '',
-        'CUSTOM_LEAVE_NO': formData.CUSTOM_LEAVE_NO || '',
-        'CUSTOM_LEAVE_NO_FA': formData.CUSTOM_LEAVE_NO_FA || '',
-        'AGENT': formData.AGENT || '',
-        'AGENT_FA': formData.AGENT_FA || '',
-        'VESSEL_NAME_FA': formData.VESSEL_NAME_FA || '',
-        'ARRIVED_FROM': formData.ARRIVED_FROM || '',
-        'ARRIVED_FROM_FA': formData.ARRIVED_FROM_FA || '',
-        'ON_DATE': formData.ON_DATE || '',
-        'ON_DATE_FA': formData.ON_DATE_FA || '',
-        'IMO_NO': formData.IMO_NO || '',
-        'IMO_NO_FA': formData.IMO_NO_FA || '',
-        'SHIPS_FLAG': formData.SHIPS_FLAG || '',
-        'SHIPS_FLAG_FA': formData.SHIPS_FLAG_FA || '',
-        'REGISTRY_PORT': formData.REGISTRY_PORT || '',
-        'REGISTRY_PORT_FA': formData.REGISTRY_PORT_FA || '',
-        'GROSS_TONNAGE': formData.GROSS_TONNAGE || '',
-        'GROSS_TONNAGE_FA': formData.GROSS_TONNAGE_FA || '',
-        'MASTER': formData.MASTER || '',
-        'MASTER_FA': formData.MASTER_FA || '',
-        'PERMITTED_TO_SAIL': formData.PERMITTED_TO_SAIL || '',
-        'PERMITTED_TO_SAIL_FA': formData.PERMITTED_TO_SAIL_FA || '',
-        'HEAD_OF_MARITIME': formData.HEAD_OF_MARITIME || '',
-        'HEAD_OF_MARITIME_FA': formData.HEAD_OF_MARITIME_FA || '',
-        'PORT': formData.PORT || '',
-        'PORT_FA': formData.PORT_FA || ''
+        'IMPORTER_COMPANY': formData.IMPORTER_COMPANY || '',
+        'IMPORTER_ADDRESS': formData.IMPORTER_ADDRESS || '',
+        'IMPORTER_POBOX': formData.IMPORTER_POBOX || '',
+        'IMPORTER_EMAIL': formData.IMPORTER_EMAIL || '',
+        
+        'CERTIFICATE_NUMBER': formData.CERTIFICATE_NUMBER || '',
+        'CERTIFICATE_DATE': formData.CERTIFICATE_DATE || '',
+        
+        'AMOUNT': formData.AMOUNT || '',
+        'INVOICE_NO': formData.INVOICE_NO || '',
+        'INVOICE_DATE': formData.INVOICE_DATE || '',
+        
+        'DESTINATION_COUNTRY': formData.DESTINATION_COUNTRY || '',
+        'DESTINATION_COUNTRY_AR': formData.DESTINATION_COUNTRY_AR || '',
+        
+        'TRANSPORT_MEANS': formData.TRANSPORT_MEANS || '',
+        'PORT_OF_DISCHARGE': formData.PORT_OF_DISCHARGE || '',
+        
+        'TOTAL_WEIGHT': formData.TOTAL_WEIGHT || '',
+        'COMMENTS': formData.COMMENTS || ''
     };
 
     // Replace all placeholders
@@ -89,36 +58,30 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
         filled = filled.replace(regex, value);
     }
 
-    // Handle crew members array
-    if (formData.CREW_MEMBERS && Array.isArray(formData.CREW_MEMBERS)) {
-        let crewHtml = '';
-        formData.CREW_MEMBERS.forEach((crew, index) => {
-            crewHtml += `
-            <!-- Row ${index + 1} -->
-            <tr>
-              <td rowspan="2" class="text-center crew-cell">${index + 1}</td>
-              <td rowspan="2" class="text-center crew-cell rtl">${crew.nameAr || ''}</td>
-              <td class="text-center crew-cell">${crew.positionEn || ''}</td>
-              <td class="text-center crew-cell">${crew.nationalityEn || ''}</td>
-              <td rowspan="2" class="text-center crew-cell">${crew.dateOfBirth || ''}</td>
-              <td rowspan="2" class="crew-cell td-thick-right">${crew.travelDocRef || ''}</td>
-              <td rowspan="2" class="crew-cell td-thick-right td-thick-left">${crew.dateOfIssue || ''}</td>
-              <td rowspan="2" class="crew-cell td-thick-right td-thick-left">${crew.dateOfExpiry || ''}</td>
-              <td rowspan="2" class="crew-cell td-thick-left">${crew.seamanBook || ''}</td>
-            </tr>
-            <tr>
-              <td class="text-center crew-cell rtl">${crew.positionAr || ''}</td>
-              <td class="text-center crew-cell rtl">${crew.nationalityAr || ''}</td>
-            </tr>
-            `;
+    // Handle products array
+    if (formData.PRODUCTS && Array.isArray(formData.PRODUCTS)) {
+        let productsHtml = '';
+        formData.PRODUCTS.forEach((product, index) => {
+            productsHtml += `
+              <tr style="display: flex; margin-top: 5px;">
+                <td style="width: 150px; padding: var(--spacing-2); vertical-align: top; border: none;">
+                  <p class="text-sm text-left">${product.marksNumbers || ''}</p>
+                </td>
+                <td style="width: 400px; padding: var(--spacing-2); vertical-align: top; border: none;">
+                  <p class="text-sm text-left">${product.description || ''} - ${product.originCountry || ''}</p>
+                </td>
+                <td style="width: 150px; padding: var(--spacing-2); vertical-align: top; border: none;">
+                  <p class="text-sm text-left">${product.processingType || ''} - ${product.processingCountry || ''}</p>
+                </td>
+                <td style="width: 110px; padding: var(--spacing-2); vertical-align: top; border: none;">
+                  <p class="text-sm text-left">${product.quantity || ''} ${product.unit || ''}</p>
+                </td>
+              </tr>`;
         });
-        // Replace the crew members placeholder
-        filled = filled.replace(/{{CREW_MEMBERS}}/g, crewHtml);
+        filled = filled.replace('{{PRODUCTS_LIST}}', productsHtml);
     } else {
-        // If no crew members, replace with empty string
-        filled = filled.replace(/{{CREW_MEMBERS}}/g, '');
+        filled = filled.replace('{{PRODUCTS_LIST}}', '');
     }
-
 
     // Replace QR Code URL if provided
     if (qrCodeUrl) {
@@ -345,7 +308,7 @@ async function generatePortClearancePDF(formData, baseUrl) {
 
     // Generate unique filename
     const uniqueId = uuidv4();
-    const filename = `port-clearance-${formData.SERIAL_NO || uniqueId}.pdf`;
+    const filename = `chamber-cert-${formData.CERTIFICATE_NUMBER || uniqueId}.pdf`;
     const finalPdfPath = path.join(storageDir, filename);
     const qrCodePath = path.join(tempDir, `qr-${uniqueId}.png`);
 

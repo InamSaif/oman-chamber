@@ -75,8 +75,8 @@ function displayDocuments(documents) {
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial No.</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vessel Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certificate No.</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exporter</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
@@ -86,8 +86,8 @@ function displayDocuments(documents) {
             <tbody class="bg-white divide-y divide-gray-200">
                 ${documents.map(doc => `
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${doc.serialNo}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${doc.formData?.VESSEL_NAME || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${doc.serialNo || doc.formData?.CERTIFICATE_NUMBER || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${doc.formData?.EXPORTER_COMPANY || '-'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                 doc.status === 'active' ? 'bg-green-100 text-green-800' : 
@@ -132,10 +132,10 @@ function showCreateForm() {
     document.getElementById('documentId').value = '';
     document.getElementById('documentForm').reset();
     
-    // Clear crew members
-    const container = document.getElementById('crewMembersContainer');
-    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No crew members added yet. Click "Add Crew Member" to start.</p>';
-    crewMemberCount = 0;
+    // Clear products
+    const container = document.getElementById('productsContainer');
+    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+    productCount = 0;
     
     document.getElementById('documentModal').classList.remove('hidden');
 }
@@ -145,10 +145,10 @@ function closeModal() {
     document.getElementById('documentModal').classList.add('hidden');
     document.getElementById('documentForm').reset();
     
-    // Clear crew members
-    const container = document.getElementById('crewMembersContainer');
-    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No crew members added yet. Click "Add Crew Member" to start.</p>';
-    crewMemberCount = 0;
+    // Clear products
+    const container = document.getElementById('productsContainer');
+    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+    productCount = 0;
 }
 
 // Handle form submission
@@ -165,24 +165,12 @@ document.getElementById('documentForm').addEventListener('submit', async (e) => 
     try {
         const formData = {};
         const fields = [
-            // New Sail Certificate fields
-            'CERTIFICATE_NUMBER', 'VESSEL_NAME', 'VESSEL_NAME_AR',
-            'VESSEL_NATIONALITY', 'VESSEL_NATIONALITY_AR', 'FLAG', 'FLAG_AR',
-            'VESSEL_AGENT_NAME', 'VESSEL_AGENT_NAME_AR', 'PORT_OF_DEPARTURE', 'PORT_OF_DEPARTURE_AR',
-            'NEXT_PORT_OF_CALL', 'NEXT_PORT_OF_CALL_AR', 'VOYAGE_NUMBER',
-            'CAPTAIN_NAME', 'CAPTAIN_NAME_AR', 'ETD', 'CUSTOMS_REMARKS',
-            'ISSUANCE_DATE', 'IMO_NUMBER',
-            
-            // Legacy fields (for backward compatibility)
-            'SERIAL_NO', 'SERIAL_NO_FA', 'MARINE_AFFAIRS_NO', 'MARINE_AFFAIRS_NO_FA',
-            'ISSUE_DATE_TIME', 'ISSUE_DATE_TIME_FA', 'PORT_CLEARANCE_NO', 'PORT_CLEARANCE_NO_FA',
-            'CUSTOM_LEAVE_NO', 'CUSTOM_LEAVE_NO_FA', 'AGENT', 'AGENT_FA',
-            'VESSEL_NAME_FA', 'ARRIVED_FROM', 'ARRIVED_FROM_FA',
-            'ON_DATE', 'ON_DATE_FA', 'IMO_NO', 'IMO_NO_FA',
-            'SHIPS_FLAG', 'SHIPS_FLAG_FA', 'REGISTRY_PORT', 'REGISTRY_PORT_FA',
-            'GROSS_TONNAGE', 'GROSS_TONNAGE_FA', 'MASTER', 'MASTER_FA',
-            'PERMITTED_TO_SAIL', 'PERMITTED_TO_SAIL_FA', 'HEAD_OF_MARITIME', 'HEAD_OF_MARITIME_FA',
-            'PORT', 'PORT_FA'
+            // Chamber of Commerce Certificate fields
+            'EXPORTER_COMPANY', 'EXPORTER_ADDRESS', 'EXPORTER_POBOX', 'EXPORTER_EMAIL',
+            'IMPORTER_COMPANY', 'IMPORTER_ADDRESS', 'IMPORTER_POBOX', 'IMPORTER_EMAIL',
+            'CERTIFICATE_NUMBER', 'CERTIFICATE_DATE', 'AMOUNT', 'INVOICE_NO', 'INVOICE_DATE',
+            'DESTINATION_COUNTRY', 'DESTINATION_COUNTRY_AR', 'TRANSPORT_MEANS', 'PORT_OF_DISCHARGE',
+            'TOTAL_WEIGHT', 'COMMENTS'
         ];
         
         fields.forEach(field => {
@@ -196,10 +184,10 @@ document.getElementById('documentForm').addEventListener('submit', async (e) => 
         const expiresAt = document.getElementById('expiresAt').value;
         if (expiresAt) formData.expiresAt = new Date(expiresAt).toISOString();
         
-        // Add crew members
-        const crewMembers = getCrewMembers();
-        if (crewMembers.length > 0) {
-            formData.CREW_MEMBERS = crewMembers;
+        // Add products
+        const products = getProducts();
+        if (products.length > 0) {
+            formData.PRODUCTS = products;
         }
         
         const url = docId ? `${API_BASE}/api/documents/${docId}` : `${API_BASE}/api/documents`;
@@ -273,43 +261,46 @@ async function editDocument(id) {
         // Fill form fields
         const fields = Object.keys(doc.formData || {});
         fields.forEach(field => {
-            // Skip CREW_MEMBERS as it needs special handling
-            if (field === 'CREW_MEMBERS') return;
+            // Skip PRODUCTS as it needs special handling
+            if (field === 'PRODUCTS') return;
             
             const input = document.getElementById(field);
             if (input) {
-                input.value = doc.formData[field] || '';
+                // Handle date fields
+                if (field === 'CERTIFICATE_DATE' || field === 'INVOICE_DATE') {
+                    const date = new Date(doc.formData[field]);
+                    input.value = date.toISOString().split('T')[0];
+                } else {
+                    input.value = doc.formData[field] || '';
+                }
             }
         });
         
-        // Load crew members if they exist
-        const crewMembers = doc.formData.CREW_MEMBERS;
-        if (crewMembers && Array.isArray(crewMembers) && crewMembers.length > 0) {
-            // Clear existing crew members
-            const container = document.getElementById('crewMembersContainer');
+        // Load products if they exist
+        const products = doc.formData.PRODUCTS;
+        if (products && Array.isArray(products) && products.length > 0) {
+            // Clear existing products
+            const container = document.getElementById('productsContainer');
             container.innerHTML = '';
-            crewMemberCount = 0;
+            productCount = 0;
             
-            // Add each crew member
-            crewMembers.forEach((crew, index) => {
-                addCrewMember();
+            // Add each product
+            products.forEach((product, index) => {
+                addProduct();
                 
-                // Fill the crew member data
+                // Fill the product data
                 setTimeout(() => {
-                    const crewElements = document.querySelectorAll('.crew-member');
-                    const currentCrew = crewElements[index];
+                    const productElements = document.querySelectorAll('.product-item');
+                    const currentProduct = productElements[index];
                     
-                    if (currentCrew) {
-                        if (crew.nameAr) currentCrew.querySelector('.crew-nameAr').value = crew.nameAr;
-                        if (crew.positionEn) currentCrew.querySelector('.crew-positionEn').value = crew.positionEn;
-                        if (crew.positionAr) currentCrew.querySelector('.crew-positionAr').value = crew.positionAr;
-                        if (crew.nationalityEn) currentCrew.querySelector('.crew-nationalityEn').value = crew.nationalityEn;
-                        if (crew.nationalityAr) currentCrew.querySelector('.crew-nationalityAr').value = crew.nationalityAr;
-                        if (crew.dateOfBirth) currentCrew.querySelector('.crew-dateOfBirth').value = crew.dateOfBirth;
-                        if (crew.travelDocRef) currentCrew.querySelector('.crew-travelDocRef').value = crew.travelDocRef;
-                        if (crew.dateOfIssue) currentCrew.querySelector('.crew-dateOfIssue').value = crew.dateOfIssue;
-                        if (crew.dateOfExpiry) currentCrew.querySelector('.crew-dateOfExpiry').value = crew.dateOfExpiry;
-                        if (crew.seamanBook) currentCrew.querySelector('.crew-seamanBook').value = crew.seamanBook;
+                    if (currentProduct) {
+                        if (product.marksNumbers) currentProduct.querySelector('.product-marksNumbers').value = product.marksNumbers;
+                        if (product.description) currentProduct.querySelector('.product-description').value = product.description;
+                        if (product.originCountry) currentProduct.querySelector('.product-originCountry').value = product.originCountry;
+                        if (product.processingType) currentProduct.querySelector('.product-processingType').value = product.processingType;
+                        if (product.processingCountry) currentProduct.querySelector('.product-processingCountry').value = product.processingCountry;
+                        if (product.quantity) currentProduct.querySelector('.product-quantity').value = product.quantity;
+                        if (product.unit) currentProduct.querySelector('.product-unit').value = product.unit;
                     }
                 }, 50 * (index + 1));
             });
@@ -444,111 +435,96 @@ function showError(message) {
     }, 100);
 }
 
-// Crew Member Management
-let crewMemberCount = 0;
+// Product Management
+let productCount = 0;
 
-function addCrewMember() {
-    crewMemberCount++;
-    const container = document.getElementById('crewMembersContainer');
+function addProduct() {
+    productCount++;
+    const container = document.getElementById('productsContainer');
     
-    // Remove the "no crew members" message if it exists
-    if (crewMemberCount === 1) {
+    // Remove the "no products" message if it exists
+    if (productCount === 1) {
         container.innerHTML = '';
     }
     
-    const crewMemberHtml = `
-        <div class="crew-member border border-gray-300 rounded-lg p-4 bg-white" data-crew-id="${crewMemberCount}">
+    const productHtml = `
+        <div class="product-item border border-gray-300 rounded-lg p-4 bg-white" data-product-id="${productCount}">
             <div class="flex justify-between items-center mb-3">
-                <h4 class="font-semibold text-gray-700">Crew Member #${crewMemberCount}</h4>
-                <button type="button" onclick="removeCrewMember(${crewMemberCount})" class="text-red-600 hover:text-red-800 text-sm">
+                <h4 class="font-semibold text-gray-700">Product #${productCount}</h4>
+                <button type="button" onclick="removeProduct(${productCount})" class="text-red-600 hover:text-red-800 text-sm">
                     ✕ Remove
                 </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Name (Arabic)</label>
-                    <input type="text" class="crew-nameAr w-full px-3 py-2 border border-gray-300 rounded text-sm" dir="rtl" placeholder="محمد اصف">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Marks & Numbers</label>
+                    <input type="text" class="product-marksNumbers w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="271012399999">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Position (EN)</label>
-                    <input type="text" class="crew-positionEn w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Captain">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                    <input type="text" class="product-description w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="GAS OIL">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Position (AR)</label>
-                    <input type="text" class="crew-positionAr w-full px-3 py-2 border border-gray-300 rounded text-sm" dir="rtl" placeholder="قبطان">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Origin Country</label>
+                    <input type="text" class="product-originCountry w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Iraq">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Nationality (EN)</label>
-                    <input type="text" class="crew-nationalityEn w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="PAKISTAN">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Processing Type</label>
+                    <input type="text" class="product-processingType w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Processed In">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Nationality (AR)</label>
-                    <input type="text" class="crew-nationalityAr w-full px-3 py-2 border border-gray-300 rounded text-sm" dir="rtl" placeholder="باكستان">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Processing Country</label>
+                    <input type="text" class="product-processingCountry w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Oman">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
-                    <input type="text" class="crew-dateOfBirth w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="03/10/1955">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
+                    <input type="text" class="product-quantity w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="1950">
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Travel Doc Ref No.</label>
-                    <input type="text" class="crew-travelDocRef w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="AS3174333">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Date of Issue</label>
-                    <input type="text" class="crew-dateOfIssue w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="15/09/2021">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Date of Expiry</label>
-                    <input type="text" class="crew-dateOfExpiry w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="14/09/2026">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Seaman Book</label>
-                    <input type="text" class="crew-seamanBook w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="AS3174333">
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Unit</label>
+                    <input type="text" class="product-unit w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Ton">
                 </div>
             </div>
         </div>
     `;
     
-    container.insertAdjacentHTML('beforeend', crewMemberHtml);
+    container.insertAdjacentHTML('beforeend', productHtml);
 }
 
-function removeCrewMember(id) {
-    const crewMember = document.querySelector(`[data-crew-id="${id}"]`);
-    if (crewMember) {
-        crewMember.remove();
+function removeProduct(id) {
+    const product = document.querySelector(`[data-product-id="${id}"]`);
+    if (product) {
+        product.remove();
     }
     
-    // If no crew members left, show the message again
-    const container = document.getElementById('crewMembersContainer');
+    // If no products left, show the message again
+    const container = document.getElementById('productsContainer');
     if (container.children.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No crew members added yet. Click "Add Crew Member" to start.</p>';
-        crewMemberCount = 0;
+        container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+        productCount = 0;
     }
 }
 
-function getCrewMembers() {
-    const crewMembers = [];
-    const crewElements = document.querySelectorAll('.crew-member');
+function getProducts() {
+    const products = [];
+    const productElements = document.querySelectorAll('.product-item');
     
-    crewElements.forEach(crew => {
-        const member = {
-            nameAr: crew.querySelector('.crew-nameAr').value.trim(),
-            positionEn: crew.querySelector('.crew-positionEn').value.trim(),
-            positionAr: crew.querySelector('.crew-positionAr').value.trim(),
-            nationalityEn: crew.querySelector('.crew-nationalityEn').value.trim(),
-            nationalityAr: crew.querySelector('.crew-nationalityAr').value.trim(),
-            dateOfBirth: crew.querySelector('.crew-dateOfBirth').value.trim(),
-            travelDocRef: crew.querySelector('.crew-travelDocRef').value.trim(),
-            dateOfIssue: crew.querySelector('.crew-dateOfIssue').value.trim(),
-            dateOfExpiry: crew.querySelector('.crew-dateOfExpiry').value.trim(),
-            seamanBook: crew.querySelector('.crew-seamanBook').value.trim()
+    productElements.forEach(productEl => {
+        const product = {
+            marksNumbers: productEl.querySelector('.product-marksNumbers').value.trim(),
+            description: productEl.querySelector('.product-description').value.trim(),
+            originCountry: productEl.querySelector('.product-originCountry').value.trim(),
+            processingType: productEl.querySelector('.product-processingType').value.trim(),
+            processingCountry: productEl.querySelector('.product-processingCountry').value.trim(),
+            quantity: productEl.querySelector('.product-quantity').value.trim(),
+            unit: productEl.querySelector('.product-unit').value.trim()
         };
         
-        // Only add if at least name is filled
-        if (member.nameAr) {
-            crewMembers.push(member);
+        // Only add if at least description is filled
+        if (product.description) {
+            products.push(product);
         }
     });
     
-    return crewMembers;
+    return products;
 }

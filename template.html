@@ -579,15 +579,15 @@
           <td class="table-cell w-279">
             <p><br /></p>
             <p class="text-sm pl-8 text-left">
-              Company Name : Alliance international energy LLC
+              Company Name : {{EXPORTER_COMPANY}}
             </p>
             <p class="text-sm pt-4 pl-8 text-left lh-relaxed">
-              Address : South Al Khuwair, Bousher, Muscat Governorate, 116<br/>
-              PO box : 283
+              Address : {{EXPORTER_ADDRESS}}<br/>
+              PO box : {{EXPORTER_POBOX}}
             </p>
             <p class="text-sm pl-8 text-left">
-              <a href="mailto:mohadahmed496@gmail.com" target="_blank"
-                >Email address : mohadahmed496@gmail.com</a
+              <a href="mailto:{{EXPORTER_EMAIL}}" target="_blank"
+                >Email address : {{EXPORTER_EMAIL}}</a
               >
             </p>
           </td>
@@ -610,23 +610,22 @@
           <td class="table-cell w-279" rowspan="3">
             <p><br /></p>
             <p class="text-sm pl-8 text-left">
-              Company Name : NOBLE ENERGY FZE
+              Company Name : {{IMPORTER_COMPANY}}
             </p>
             <p class="text-sm pt-4 pl-8 text-left">
-              Address : P2-HAMRIYAH BUSINESS CENTER , HAMRIYAH FREE ZONE
-              ,SHARJAH UAE
+              Address : {{IMPORTER_ADDRESS}}
             </p>
-            <p class="text-sm pt-4 pl-8 text-left">PO box : 283</p>
+            <p class="text-sm pt-4 pl-8 text-left">PO box : {{IMPORTER_POBOX}}</p>
             <p class="text-sm pt-4 pl-8 text-left">
-              <a href="mailto:nobelenergy128@gmail.com" target="_blank"
-                >Email address : nobelenergy128@gmail.com</a
+              <a href="mailto:{{IMPORTER_EMAIL}}" target="_blank"
+                >Email address : {{IMPORTER_EMAIL}}</a
               >
             </p>
           </td>
           <td class="table-cell w-280" colspan="2">
             <div class="flex" style="height: 35px">
-              <p class="text-sm pl-5 text-left">4. Certificate No <br/><br/> F25111164554</p>
-              <p class="text-sm pt-4 pl-8 text-left">Date <br/><br/> 2025-11-17</p>
+              <p class="text-sm pl-5 text-left">4. Certificate No <br/><br/> {{CERTIFICATE_NUMBER}}</p>
+              <p class="text-sm pt-4 pl-8 text-left">Date <br/><br/> {{CERTIFICATE_DATE}}</p>
             </div>
           </td>
         </tr>
@@ -635,15 +634,15 @@
         <tr class="h-33" style="display: flex;">
           <td class="table-cell flex" style="width: 100%;">
             <p class="text-sm pl-5 text-left">
-              5. Amount <br/><br/> 534300 USD
+              5. Amount <br/><br/> {{AMOUNT}} USD
             </p>
             <span class="rtl text-sm">القيمة</span>
           </td>
           <td class="table-cell flex" style="width: 100%; border-left: 1px solid #000 !important; border-right: 1px solid #000 !important;">
             <p class="text-sm pl-8 text-left">
               6. Invoice No &amp; Date<br/><br/>
-              NOB/002/11/2025 ,
-              2025-11-18
+              {{INVOICE_NO}} ,
+              {{INVOICE_DATE}}
             </p>
             <span class="rtl text-sm">رقم وتاريخ الفاتورة</span> 
           </td>
@@ -654,9 +653,9 @@
           <td class="table-cell flex" style="width: 100%; border-top: 1px solid #000 !important; border-right: 1px solid #000 !important;" colspan="2">
             <p class="text-sm pl-5 text-left">
               7. Country of Final Destination<br/><br/>
-              United Arab Emirates
+              {{DESTINATION_COUNTRY}}
             </p>
-            <span class="rtl text-sm">بلد الوجهة الأخيرة<br/><br/>الإمارات العربية المتحدة</span>
+            <span class="rtl text-sm">بلد الوجهة الأخيرة<br/><br/>{{DESTINATION_COUNTRY_AR}}</span>
           </td>
         </tr>
 
@@ -665,7 +664,7 @@
           <td class="table-cell w-279" >
             <div class="flex" style="height: 40px; width: 100%;">
               <p class="text-sm pl-5 text-left">
-                3. Means of Transport <br/><br/> sea
+                3. Means of Transport <br/><br/> {{TRANSPORT_MEANS}}
               </p>
               <span class="rtl text-sm">وسيلة النقل / الشحن</span>
             </div>
@@ -673,7 +672,7 @@
           <td class="table-cell w-280" colspan="2">
             <div class="flex" style="height: 38px;">
               <p class="text-sm pl-5 text-left">
-                8. Port of Discharge <br/><br/> HAMRIYAH
+                8. Port of Discharge <br/><br/> {{PORT_OF_DISCHARGE}}
               </p>
               <span class="rtl text-sm">ميناء / مكان التفريغ</span>
             </div>
@@ -748,23 +747,9 @@
                   <span class="rtl text-sm pt-3">الكمية و الوحدة</span> 
                 </td>
               </tr>
-              <tr style="display: flex; margin-top: 5px;">
-                <td style="width: 150px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <p class="text-sm text-left">271012399999</p>
-                </td>
-                <td style="width: 400px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <p class="text-sm text-left">GAS OIL - Iraq</p>
-                </td>
-                <td style="width: 150px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <p class="text-sm text-left">Processed In - Oman</p>
-                </td>
-                <td style="width: 110px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <p class="text-sm text-left">1950 Ton - 1950 Ton</p>
-                </td>
-              </tr>
+              {{PRODUCTS_LIST}}
                <tr style="display: flex; margin-top: 5px; margin-bottom: 10px;">
                 <td style="width: 150px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <!-- <p class="text-sm text-left">271012399999</p> -->
                 </td>
                 <td style="width: 400px; padding: var(--spacing-2); vertical-align: top; border: none;">
                   <p class="text-sm text-left text-bold">Total Weight</p>
@@ -773,20 +758,12 @@
                   <p class="text-sm text-left"></p>
                 </td>
                 <td style="width: 110px; padding: var(--spacing-2); vertical-align: top; border: none;">
-                  <p class="text-sm text-left text-bold">1950 Ton</p>
+                  <p class="text-sm text-left text-bold">{{TOTAL_WEIGHT}}</p>
                 </td>
               </tr>
               <tr style="height: 280px;">
                 <td class="" colspan="4">
-                  <!-- <p><br /></p>
-                  <p class="product-desc text-left">
-                    271012399999 GAS OIL - Iraq Processed In - Oman 1950 Ton -
-                    1950 Ton
-                  </p>
-                  <p><br /></p>
-                  <p class="total-weight text-left">Total Weight 1950 Ton</p>
-                  <p><br /></p> -->
-                  <p class="comments-label text-left">Comments:</p>
+                  <p class="comments-label text-left">Comments: {{COMMENTS}}</p>
                 </td>
               </tr>
             </table>
