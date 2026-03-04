@@ -11,7 +11,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin123
       MONGO_INITDB_DATABASE: omanchamber
     ports:
-      - "27019:27017"
+      - "27016:27017"
     volumes:
       - omanchamber_mongodb_data:/data/db
       - omanchamber_mongodb_config:/data/configdb
