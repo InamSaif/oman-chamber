@@ -166,6 +166,10 @@ async function embedAllImages(html, baseDir) {
             let mimeType = 'image/png'; // Default
             if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
             else if (ext === '.svg') mimeType = 'image/svg+xml';
+            else if (ext === '.ttf') mimeType = 'font/ttf';
+            else if (ext === '.woff') mimeType = 'font/woff';
+            else if (ext === '.woff2') mimeType = 'font/woff2';
+            else if (ext === '.otf') mimeType = 'font/otf';
             
             // Read file
             const imgBuffer = await fs.readFile(imagePath);
