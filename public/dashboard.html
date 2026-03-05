@@ -1,339 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Chamber of Commerce</title>
+    <title>Dashboard - Chamber Certificates</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#011f49',   /* deep navy */
-                        secondary: '#00A39C', /* chamber teal */
-                        accent: '#fbbf24',    /* warm gold */
+                        primary: '#011f49',
+                        secondary: '#00A39C',
+                        accent: '#fbbf24',
                     }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .dashboard-input:focus { box-shadow: 0 0 0 2px rgba(0, 163, 156, 0.25); }
+        .drawer-backdrop { backdrop-filter: blur(6px); }
+        .drawer-panel { transition: transform 0.25s ease-out; }
     </style>
 </head>
-
-<body class="bg-slate-100">
-    <!-- Navigation -->
-    <nav class="bg-gradient-to-r from-primary to-secondary shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                        </svg>
-                        <span class="ml-2 text-xl font-semibold text-white tracking-wide">Chamber Certificates</span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-slate-100">Welcome, <span id="userName"
-                            class="font-semibold"></span></span>
-                    <button onclick="logout()"
-                        class="text-sm text-slate-100 hover:text-white font-medium border border-white/30 px-3 py-1 rounded-full hover:bg-white/10 transition-colors">Logout</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Chamber of Commerce Certificates</h1>
-            <p class="mt-2 text-gray-600">Manage and generate certificates with dynamic QR codes</p>
-        </div>
-
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5">
-                        <p class="text-sm font-medium text-gray-500">Active Documents</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="activeCount">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5">
-                        <p class="text-sm font-medium text-gray-500">Expired Documents</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="expiredCount">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5">
-                        <p class="text-sm font-medium text-gray-500">Total Documents</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="totalCount">0</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="mb-6 flex justify-between items-center">
-            <button onclick="showCreateForm()"
-                class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+<body class="min-h-screen bg-slate-100 flex">
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col bg-primary shadow-xl">
+        <div class="flex items-center gap-3 px-5 h-16 border-b border-white/10">
+            <div class="w-9 h-9 rounded-lg bg-secondary/30 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                Create New Certificate
-            </button>
-            <button onclick="loadDocuments()" class="text-primary hover:text-secondary font-medium flex items-center">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
+            </div>
+            <span class="font-semibold text-white text-sm tracking-tight">Chamber Certificates</span>
+        </div>
+        <nav class="flex-1 py-4">
+            <a href="#" class="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg bg-white/10 text-white text-sm font-medium">
+                <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Certificates
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <p class="text-white/70 text-xs truncate px-1" id="userName">User</p>
+            <button onclick="logout()" class="mt-2 w-full py-2 rounded-lg text-sm font-medium text-white/90 hover:bg-white/10 transition-colors text-left px-3">
+                Logout
             </button>
         </div>
+    </aside>
 
-        <!-- Documents Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">Your Certificates</h2>
+    <!-- Main -->
+    <main class="flex-1 min-h-screen pl-64 flex flex-col">
+        <!-- Top bar -->
+        <header class="sticky top-0 z-30 flex items-center justify-between gap-4 px-8 py-5 bg-white/80 border-b border-slate-200/80 backdrop-blur-sm">
+            <div>
+                <h1 class="text-lg font-bold text-slate-900">Certificates</h1>
+                <p class="text-sm text-slate-500 mt-0.5">Create and manage Chamber of Commerce certificates</p>
             </div>
-            <div id="documentsContainer" class="overflow-x-auto">
-                <div class="flex items-center justify-center py-12">
-                    <div class="text-center">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                        <p class="mt-4 text-gray-600">Loading certificates...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create/Edit Document Modal -->
-    <div id="documentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-10 mx-auto p-5 border w-full max-w-6xl shadow-lg rounded-md bg-white mb-20">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Create New Certificate</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+            <div class="flex items-center gap-3">
+                <button onclick="loadDocuments()" class="p-2.5 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors" title="Refresh">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+                <button onclick="showCreateForm()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-secondary hover:bg-secondary/90 shadow-md hover:shadow-lg transition-all text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    New Certificate
                 </button>
             </div>
+        </header>
 
-            <form id="documentForm" class="space-y-6">
+        <!-- Stats strip -->
+        <div class="px-8 py-4">
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center gap-3 px-5 py-3 rounded-xl bg-white border border-slate-200/80 shadow-sm min-w-0">
+                    <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-sm text-slate-500">Active</span>
+                    <span class="text-xl font-bold text-slate-900 tabular-nums" id="activeCount">0</span>
+                </div>
+                <div class="flex items-center gap-3 px-5 py-3 rounded-xl bg-white border border-slate-200/80 shadow-sm min-w-0">
+                    <span class="flex h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span class="text-sm text-slate-500">Expired</span>
+                    <span class="text-xl font-bold text-slate-900 tabular-nums" id="expiredCount">0</span>
+                </div>
+                <div class="flex items-center gap-3 px-5 py-3 rounded-xl bg-primary text-white shadow-md min-w-0">
+                    <span class="text-sm text-white/80">Total</span>
+                    <span class="text-xl font-bold tabular-nums" id="totalCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 px-8 pb-8">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wider">Your certificates</h2>
+            </div>
+            <div id="documentsContainer" class="space-y-3">
+                <div class="flex items-center justify-center py-20 rounded-2xl border-2 border-dashed border-slate-200 bg-white/50">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-9 w-9 border-2 border-slate-200 border-t-primary mx-auto"></div>
+                        <p class="mt-3 text-slate-500 text-sm">Loading certificates…</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit drawer (same form, same IDs - UI only) -->
+    <div id="documentModal" class="hidden fixed inset-0 z-50 drawer-backdrop bg-slate-900/40">
+        <div class="absolute inset-0" onclick="closeModal()" aria-hidden="true"></div>
+        <div class="drawer-panel absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50 shrink-0">
+                <h3 class="text-lg font-semibold text-slate-900" id="modalTitle">Create New Certificate</h3>
+                <button onclick="closeModal()" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form id="documentForm" class="flex-1 overflow-y-auto p-6 space-y-6">
                 <input type="hidden" id="documentId">
 
-                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                    <p class="text-sm text-blue-800">
-                        <strong>Quick Start:</strong> Fill in the fields below to generate your Chamber of Commerce Certificate PDF.
-                    </p>
+                <div class="rounded-xl bg-secondary/10 border border-secondary/20 p-4">
+                    <p class="text-sm text-slate-700"><strong>Quick Start:</strong> Fill in the fields below to generate your Chamber of Commerce Certificate PDF.</p>
                 </div>
 
-                <!-- Exporter Information -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Exporter Information</h3>
+                <div class="rounded-xl border border-slate-200 bg-slate-50/30 p-5">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-4">1. Exporter Information</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                            <input type="text" id="EXPORTER_COMPANY"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="Alliance international energy LLC" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Company Name</label>
+                            <input type="text" id="EXPORTER_COMPANY" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="Alliance international energy LLC">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <input type="text" id="EXPORTER_ADDRESS"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="South Al Khuwair, Bousher, Muscat Governorate, 116" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Address</label>
+                            <input type="text" id="EXPORTER_ADDRESS" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="South Al Khuwair, Bousher, Muscat Governorate, 116">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">PO Box</label>
-                            <input type="text" id="EXPORTER_POBOX"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="283" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">PO Box</label>
+                            <input type="text" id="EXPORTER_POBOX" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="283">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="EXPORTER_EMAIL"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="exporter@company.com" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="EXPORTER_EMAIL" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="exporter@company.com">
                         </div>
                     </div>
                 </div>
 
-                <!-- Importer Information -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Importer Information</h3>
+                <div class="rounded-xl border border-slate-200 bg-slate-50/30 p-5">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-4">2. Importer Information</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                            <input type="text" id="IMPORTER_COMPANY"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="NOBLE ENERGY FZE" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Company Name</label>
+                            <input type="text" id="IMPORTER_COMPANY" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="NOBLE ENERGY FZE">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <input type="text" id="IMPORTER_ADDRESS"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="P2-HAMRIYAH BUSINESS CENTER, HAMRIYAH FREE ZONE, SHARJAH UAE" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Address</label>
+                            <input type="text" id="IMPORTER_ADDRESS" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="P2-HAMRIYAH BUSINESS CENTER, HAMRIYAH FREE ZONE, SHARJAH UAE">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">PO Box</label>
-                            <input type="text" id="IMPORTER_POBOX"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="283" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">PO Box</label>
+                            <input type="text" id="IMPORTER_POBOX" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="283">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="IMPORTER_EMAIL"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="importer@company.com" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="IMPORTER_EMAIL" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="importer@company.com">
                         </div>
                     </div>
                 </div>
 
-                <!-- Certificate Details -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Certificate Details</h3>
+                <div class="rounded-xl border border-slate-200 bg-slate-50/30 p-5">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-4">Certificate Details</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Certificate Number</label>
-                            <input type="text" id="CERTIFICATE_NUMBER"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="F25111164554" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Certificate Number</label>
+                            <input type="text" id="CERTIFICATE_NUMBER" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="F25111164554">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Certificate Date</label>
-                            <input type="date" id="CERTIFICATE_DATE"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Certificate Date</label>
+                            <input type="date" id="CERTIFICATE_DATE" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount (USD)</label>
-                            <input type="number" id="AMOUNT"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="534300" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Amount (USD)</label>
+                            <input type="number" id="AMOUNT" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="534300">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Number</label>
-                            <input type="text" id="INVOICE_NO"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="NOB/002/11/2025" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Invoice Number</label>
+                            <input type="text" id="INVOICE_NO" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="NOB/002/11/2025">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Date</label>
-                            <input type="date" id="INVOICE_DATE"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Invoice Date</label>
+                            <input type="date" id="INVOICE_DATE" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white">
                         </div>
                     </div>
                 </div>
 
-                <!-- Shipping Details -->
-                <div class="border border-gray-200 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Shipping Details</h3>
+                <div class="rounded-xl border border-slate-200 bg-slate-50/30 p-5">
+                    <h3 class="text-sm font-semibold text-slate-800 mb-4">Shipping Details</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Country of Destination (EN)</label>
-                            <input type="text" id="DESTINATION_COUNTRY"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="United Arab Emirates" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Country of Destination (EN)</label>
+                            <input type="text" id="DESTINATION_COUNTRY" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="United Arab Emirates">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Country of Destination (AR)</label>
-                            <input type="text" id="DESTINATION_COUNTRY_AR" dir="rtl"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="الإمارات العربية المتحدة" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Country of Destination (AR)</label>
+                            <input type="text" id="DESTINATION_COUNTRY_AR" dir="rtl" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="الإمارات العربية المتحدة">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Means of Transport</label>
-                            <input type="text" id="TRANSPORT_MEANS"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="sea" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Means of Transport</label>
+                            <input type="text" id="TRANSPORT_MEANS" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="sea">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Port of Discharge</label>
-                            <input type="text" id="PORT_OF_DISCHARGE"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="HAMRIYAH" required>
+                            <label class="block text-sm font-medium text-slate-600 mb-1.5">Port of Discharge</label>
+                            <input type="text" id="PORT_OF_DISCHARGE" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="HAMRIYAH">
                         </div>
                     </div>
                 </div>
 
-                <!-- Products Section -->
-                <div class="border border-gray-200 rounded-lg p-4">
+                <div class="rounded-xl border border-slate-200 bg-slate-50/30 p-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Products</h3>
-                        <button type="button" onclick="addProduct()"
-                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm">
-                            + Add Product
-                        </button>
+                        <h3 class="text-sm font-semibold text-slate-800">Products</h3>
+                        <button type="button" onclick="addProduct()" class="px-4 py-2 rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-colors">+ Add Product</button>
                     </div>
                     <div id="productsContainer" class="space-y-4">
-                        <p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>
+                        <p class="text-sm text-slate-500 text-center py-6">No products added yet. Click "Add Product" to start.</p>
                     </div>
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Weight</label>
-                        <input type="text" id="TOTAL_WEIGHT"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            placeholder="1950 Ton" required>
+                        <label class="block text-sm font-medium text-slate-600 mb-1.5">Total Weight</label>
+                        <input type="text" id="TOTAL_WEIGHT" required class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white" placeholder="1950 Ton">
                     </div>
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Comments (Optional)</label>
-                        <textarea id="COMMENTS" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            placeholder="Enter any additional comments..."></textarea>
+                        <label class="block text-sm font-medium text-slate-600 mb-1.5">Comments (Optional)</label>
+                        <textarea id="COMMENTS" rows="3" class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white resize-none" placeholder="Enter any additional comments..."></textarea>
                     </div>
                 </div>
 
-                <!-- Expiration Date -->
-                <div class="p-4 bg-yellow-50 rounded-lg">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Document Expiration (Optional)</label>
-                    <input type="datetime-local" id="expiresAt"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <p class="mt-1 text-xs text-gray-500">Leave empty for no expiration. QR code will stop working after
-                        this date.</p>
+                <div class="rounded-xl border border-amber-200 bg-amber-50/50 p-5">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Document Expiration (Optional)</label>
+                    <input type="datetime-local" id="expiresAt" class="dashboard-input w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:border-secondary focus:ring-0 transition bg-white">
+                    <p class="mt-1.5 text-xs text-slate-500">Leave empty for no expiration. QR code will stop working after this date.</p>
                 </div>
 
-                <!-- Submit Buttons -->
-                <div class="flex justify-end space-x-4 pt-4 border-t">
-                    <button type="button" onclick="closeModal()"
-                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-                    <button type="submit" id="submitBtn"
-                        class="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:shadow-lg">
-                        <span id="btnText">Create Certificate</span>
-                    </button>
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 sticky bottom-0 bg-white">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
+                    <button type="submit" id="submitBtn" class="px-6 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-primary to-secondary hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"><span id="btnText">Create Certificate</span></button>
                 </div>
             </form>
         </div>
@@ -341,5 +249,4 @@
 
     <script src="/public/dashboard.js"></script>
 </body>
-
 </html>

@@ -33,7 +33,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - BASE_URL=${DOCKER_HOST_IP:-http://localhost:3005}
+      - BASE_URL=${DOCKER_HOST_IP:-http://localhost:3006}
       - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/omanchamber?authSource=admin
       - JWT_SECRET=your-super-secret-jwt-key-change-in-production-now
       - JWT_EXPIRE=30d

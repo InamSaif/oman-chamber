@@ -59,59 +59,44 @@ function displayDocuments(documents) {
     
     if (!documents || documents.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-12">
-                <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                <p class="mt-4 text-gray-600">No documents yet</p>
-                <p class="text-sm text-gray-500">Create your first port clearance document</p>
-                <button onclick="showCreateForm()" class="mt-4 text-primary hover:text-secondary font-medium">Create Document</button>
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-white/50 flex flex-col items-center justify-center py-16 px-6">
+                <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <p class="mt-4 text-slate-600 font-medium">No certificates yet</p>
+                <p class="mt-1 text-sm text-slate-500">Create your first certificate to get started</p>
+                <button onclick="showCreateForm()" class="mt-6 px-5 py-2.5 rounded-xl font-medium text-white bg-secondary hover:bg-secondary/90 shadow-md transition-all">New Certificate</button>
             </div>
         `;
         return;
     }
 
-    const table = `
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certificate No.</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exporter</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                ${documents.map(doc => `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${doc.serialNo || doc.formData?.CERTIFICATE_NUMBER || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${doc.formData?.EXPORTER_COMPANY || '-'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                doc.status === 'active' ? 'bg-green-100 text-green-800' : 
-                                doc.status === 'expired' ? 'bg-yellow-100 text-yellow-800' : 
-                                'bg-red-100 text-red-800'
-                            }">
-                                ${doc.status}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(doc.createdAt).toLocaleDateString()}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${doc.expiresAt ? new Date(doc.expiresAt).toLocaleDateString() : 'Never'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <button onclick="viewDocument('${doc._id}')" class="text-blue-600 hover:text-blue-900">View</button>
-                            <button onclick="editDocument('${doc._id}')" class="text-primary hover:text-secondary">Edit</button>
-                            ${doc.status === 'active' ? `<button onclick="expireDocument('${doc._id}')" class="text-yellow-600 hover:text-yellow-900">Expire</button>` : ''}
-                            <button onclick="deleteDocument('${doc._id}')" class="text-red-600 hover:text-red-900">Delete</button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
-    
-    container.innerHTML = table;
+    const cards = documents.map(doc => {
+        const statusClass = doc.status === 'active' ? 'bg-emerald-50 text-emerald-700' : doc.status === 'expired' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700';
+        return `
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all flex flex-wrap items-center gap-4">
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-slate-900 truncate">${doc.serialNo || doc.formData?.CERTIFICATE_NUMBER || '—'}</p>
+                    <p class="text-sm text-slate-500 truncate mt-0.5">${doc.formData?.EXPORTER_COMPANY || '—'}</p>
+                </div>
+                <span class="px-2.5 py-1 text-xs font-medium rounded-lg shrink-0 ${statusClass}">${doc.status}</span>
+                <div class="flex flex-wrap gap-4 text-xs text-slate-500 shrink-0">
+                    <span>Created ${new Date(doc.createdAt).toLocaleDateString()}</span>
+                    <span>${doc.expiresAt ? 'Expires ' + new Date(doc.expiresAt).toLocaleDateString() : 'No expiry'}</span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="viewDocument('${doc._id}')" class="px-3 py-1.5 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors">View</button>
+                    <button onclick="editDocument('${doc._id}')" class="px-3 py-1.5 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors">Edit</button>
+                    ${doc.status === 'active' ? `<button onclick="expireDocument('${doc._id}')" class="px-3 py-1.5 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50 transition-colors">Expire</button>` : ''}
+                    <button onclick="deleteDocument('${doc._id}')" class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = cards;
 }
 
 // Update stats
@@ -134,7 +119,7 @@ function showCreateForm() {
     
     // Clear products
     const container = document.getElementById('productsContainer');
-    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-6">No products added yet. Click "Add Product" to start.</p>';
     productCount = 0;
     
     document.getElementById('documentModal').classList.remove('hidden');
@@ -147,7 +132,7 @@ function closeModal() {
     
     // Clear products
     const container = document.getElementById('productsContainer');
-    container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-6">No products added yet. Click "Add Product" to start.</p>';
     productCount = 0;
 }
 
@@ -448,41 +433,39 @@ function addProduct() {
     }
     
     const productHtml = `
-        <div class="product-item border border-gray-300 rounded-lg p-4 bg-white" data-product-id="${productCount}">
+        <div class="product-item rounded-xl border border-slate-200 bg-white p-4 shadow-sm" data-product-id="${productCount}">
             <div class="flex justify-between items-center mb-3">
-                <h4 class="font-semibold text-gray-700">Product #${productCount}</h4>
-                <button type="button" onclick="removeProduct(${productCount})" class="text-red-600 hover:text-red-800 text-sm">
-                    ✕ Remove
-                </button>
+                <h4 class="text-sm font-semibold text-slate-700">Product #${productCount}</h4>
+                <button type="button" onclick="removeProduct(${productCount})" class="text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors">✕ Remove</button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Marks & Numbers</label>
-                    <input type="text" class="product-marksNumbers w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="271012399999">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Marks & Numbers</label>
+                    <input type="text" class="product-marksNumbers w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="271012399999">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
-                    <input type="text" class="product-description w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="GAS OIL">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Description</label>
+                    <input type="text" class="product-description w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="GAS OIL">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Origin Country</label>
-                    <input type="text" class="product-originCountry w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Iraq">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Origin Country</label>
+                    <input type="text" class="product-originCountry w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="Iraq">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Processing Type</label>
-                    <input type="text" class="product-processingType w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Processed In">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Processing Type</label>
+                    <input type="text" class="product-processingType w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="Processed In">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Processing Country</label>
-                    <input type="text" class="product-processingCountry w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Oman">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Processing Country</label>
+                    <input type="text" class="product-processingCountry w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="Oman">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
-                    <input type="text" class="product-quantity w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="1950">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Quantity</label>
+                    <input type="text" class="product-quantity w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="1950">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Unit</label>
-                    <input type="text" class="product-unit w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Ton">
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Unit</label>
+                    <input type="text" class="product-unit w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-secondary focus:ring-1 focus:ring-secondary/30" placeholder="Ton">
                 </div>
             </div>
         </div>
@@ -500,7 +483,7 @@ function removeProduct(id) {
     // If no products left, show the message again
     const container = document.getElementById('productsContainer');
     if (container.children.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-600 text-center py-4">No products added yet. Click "Add Product" to start.</p>';
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-6">No products added yet. Click "Add Product" to start.</p>';
         productCount = 0;
     }
 }
