@@ -39,6 +39,7 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
         'CERTIFICATE_DATE': formData.CERTIFICATE_DATE || '',
         
         'AMOUNT': formData.AMOUNT || '',
+        'CURRENCY': formData.CURRENCY || 'USD',
         'INVOICE_NO': formData.INVOICE_NO || '',
         'INVOICE_DATE': formData.INVOICE_DATE || '',
         
