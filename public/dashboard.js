@@ -170,7 +170,7 @@ document.getElementById('documentForm').addEventListener('submit', async (e) => 
             'IMPORTER_COMPANY', 'IMPORTER_ADDRESS', 'IMPORTER_POBOX', 'IMPORTER_EMAIL',
             'CERTIFICATE_NUMBER', 'CERTIFICATE_DATE', 'AMOUNT', 'INVOICE_NO', 'INVOICE_DATE',
             'DESTINATION_COUNTRY', 'DESTINATION_COUNTRY_AR', 'TRANSPORT_MEANS', 'PORT_OF_DISCHARGE',
-            'TOTAL_WEIGHT', 'CURRENCY', 'COMMENTS'
+            'TOTAL_WEIGHT', 'COMMENTS'
         ];
         
         fields.forEach(field => {
