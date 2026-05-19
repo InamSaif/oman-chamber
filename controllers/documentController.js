@@ -90,19 +90,6 @@ exports.createDocument = async (req, res) => {
             });
         }
 
-        // Check if serial number already exists
-        const existingDoc = await Document.findOne({ 
-            serialNo: serialNo,
-            status: { $ne: 'deleted' }
-        });
-
-        if (existingDoc) {
-            return res.status(400).json({
-                success: false,
-                error: 'Document with this serial/certificate number already exists'
-            });
-        }
-
         console.log('Generating Port Clearance PDF for user:', req.user.id);
         console.log('Form Data:', formData);
 
@@ -157,22 +144,6 @@ exports.updateDocument = async (req, res) => {
 
         // Use CERTIFICATE_NUMBER as serial number if SERIAL_NO is not provided
         const newSerialNo = formData.SERIAL_NO || formData.CERTIFICATE_NUMBER;
-
-        // If serial number is being changed, check if it already exists
-        if (newSerialNo && newSerialNo !== document.serialNo) {
-            const existingDoc = await Document.findOne({ 
-                serialNo: newSerialNo,
-                status: { $ne: 'deleted' },
-                _id: { $ne: document._id }
-            });
-
-            if (existingDoc) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Document with this serial/certificate number already exists'
-                });
-            }
-        }
 
         // Delete old PDF file
         try {
@@ -290,9 +261,21 @@ exports.expireDocument = async (req, res) => {
 // @access  Public
 exports.verifyDocument = async (req, res) => {
     try {
-        const document = await Document.findOne({ 
-            serialNo: req.params.serialNo 
-        });
+        // Note: serialNo is no longer unique; prefer the newest active document.
+        const serialNo = req.params.serialNo;
+
+        let document = await Document.findOne({ serialNo, status: 'active' })
+            .sort({ createdAt: -1 });
+
+        if (!document) {
+            document = await Document.findOne({ serialNo, status: 'expired' })
+                .sort({ createdAt: -1 });
+        }
+
+        if (!document) {
+            document = await Document.findOne({ serialNo, status: 'deleted' })
+                .sort({ createdAt: -1 });
+        }
 
         if (!document) {
             return res.status(404).json({

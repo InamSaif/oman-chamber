@@ -9,7 +9,6 @@ const documentSchema = new mongoose.Schema({
     serialNo: {
         type: String,
         required: [true, 'Serial number is required'],
-        unique: true,
         trim: true
     },
     filename: {

@@ -37,11 +37,43 @@ async function setupDirectories() {
 }
 
 // Connect to MongoDB
+const dropUniqueSerialNoIndexes = async () => {
+    try {
+        const db = mongoose.connection.db;
+        if (!db) return;
+
+        const collection = db.collection('documents');
+        const indexes = await collection.indexes();
+
+        const uniqueSerialIndexes = indexes.filter(idx => {
+            const hasSerialNoKey = idx?.key && Object.prototype.hasOwnProperty.call(idx.key, 'serialNo');
+            return Boolean(idx?.unique && hasSerialNoKey);
+        });
+
+        for (const idx of uniqueSerialIndexes) {
+            try {
+                await collection.dropIndex(idx.name);
+                console.log(`✅ Dropped unique index on serialNo: ${idx.name}`);
+            } catch (error) {
+                // Index may already be gone or insufficient privileges.
+                console.warn(`⚠️  Could not drop index ${idx.name}:`, error?.message || error);
+            }
+        }
+    } catch (error) {
+        // Collection may not exist yet or listing indexes may be disallowed.
+        const message = error?.message || String(error);
+        if (!message.includes('ns does not exist') && !message.includes('NamespaceNotFound')) {
+            console.warn('⚠️  Skipped dropping serialNo unique index:', message);
+        }
+    }
+};
+
 const connectDB = async () => {
     try {
         const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/qr-engine';
         await mongoose.connect(MONGODB_URI);
         console.log('✅ MongoDB connected successfully');
+        await dropUniqueSerialNoIndexes();
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
         process.exit(1);
