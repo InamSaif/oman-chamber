@@ -22,6 +22,37 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
         hour12: false 
     }).replace(',', '');
 
+    function formatDateToDMY(dateValue) {
+        if (!dateValue) {
+            return '';
+        }
+
+        const isoMatch = String(dateValue).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoMatch) {
+            return `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`;
+        }
+
+        const slashMatch = String(dateValue).match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+        if (slashMatch) {
+            return `${slashMatch[1]}/${slashMatch[2]}/${slashMatch[3]}`;
+        }
+
+        const dashMatch = String(dateValue).match(/^(\d{2})-(\d{2})-(\d{4})/);
+        if (dashMatch) {
+            return `${dashMatch[1]}/${dashMatch[2]}/${dashMatch[3]}`;
+        }
+
+        const parsedDate = new Date(dateValue);
+        if (!Number.isNaN(parsedDate.getTime())) {
+            const day = String(parsedDate.getDate()).padStart(2, '0');
+            const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+            const year = parsedDate.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        return String(dateValue);
+    }
+
     // Replace all placeholders with actual data
     const placeholders = {
         // Chamber of Commerce Certificate fields
@@ -35,8 +66,8 @@ function fillTemplate(templateHtml, formData, qrCodeUrl = null, signatureImage =
         'IMPORTER_POBOX': formData.IMPORTER_POBOX || '',
         'IMPORTER_EMAIL': formData.IMPORTER_EMAIL || '',
         
-        'CERTIFICATE_NUMBER': formData.CERTIFICATE_NUMBER || '',
-        'CERTIFICATE_DATE': formData.CERTIFICATE_DATE || '',
+        'CERTIFICATE_NUMBER': formData.SERIAL_NO || formData.CERTIFICATE_NUMBER || '',
+        'CERTIFICATE_DATE': formatDateToDMY(formData.CERTIFICATE_DATE) || printedOn.split(' ')[0],
         
         'AMOUNT': formData.AMOUNT || '',
         'INVOICE_NO': formData.INVOICE_NO || '',

@@ -471,6 +471,47 @@
         height: 74.5px;
       }
 
+      .seal-stamp {
+        position: relative;
+        display: inline-block;
+        width: 150px;
+        height: 150px;
+        margin: 10px auto 0;
+        text-align: center;
+        display: flex;
+      }
+
+      .seal-stamp__image {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .seal-stamp__serial,
+      .seal-stamp__date {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 88%;
+        font-size: 7px;
+        font-weight: 500;
+        line-height: 1.1;
+        text-align: center;
+        color: #000;
+        pointer-events: none;
+      }
+
+      .seal-stamp__serial {
+        top: 77px;
+        left: 30px;
+      }
+
+      .seal-stamp__date {
+            bottom: 65px;
+            left: 128px;
+            direction:ltr;
+      }
+
       /* Link Styles */
       a {
         color: var(--color-black);
@@ -854,9 +895,15 @@
                   <p class="cert-body text-right rtl">
                     نشهد بأنه قد تم تقديم الأدلة بأن البضاعة المذكورة أعلاه منشؤها / تصنيعها في البلد الموضح في الخانة 11. ولذلك فأن هذه الشهادة قد تم اصدارها والتصديق عليها حسب معرفتنا واعتقادنا بصحتها دون أية مسؤولية علينا.
                   </p>
-                  <p style="margin-top: 10px; text-align: center;">
-                    <img src="./assets/smalllogoomanchamber.jpg" style="width: 150px; display: inline-block;" />
-                  </p>
+                  <div class="seal-stamp">
+                    <img
+                      class="seal-stamp__image"
+                      src="./assets/smalllogoomanchamber.jpg"
+                      alt="OCCI seal"
+                    />
+                    <span class="seal-stamp__serial">{{CERTIFICATE_NUMBER}}</span>
+                    <span class="seal-stamp__date">{{CERTIFICATE_DATE}}</span>
+                  </div>
                 </td>
               </tr>
               <tr>
