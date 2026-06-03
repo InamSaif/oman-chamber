@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oman Chamber Document Viewer</title>
+    <style>
+        :root {
+            --occi-blue: #184886;
+            --occi-dark: #12356b;
+            --occi-green: #1b9b3b;
+            --text: #1c2430;
+            --muted: #6b7280;
+            --border: #d9dee8;
+            --page-bg: #f3f5f8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page-bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .site-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background: #fff;
+            border-top: 1px solid #d5d5d5;
+        }
+
+        .header-inner,
+        .footer-inner {
+            width: min(1100px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .header-inner {
+            height: 86px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 54px;
+            height: 54px;
+            border: 2px solid var(--occi-dark);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: var(--occi-dark);
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .brand-text {
+            color: var(--occi-dark);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: 0.2px;
+        }
+
+        .brand-text .arabic {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .brand-text .english {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: #0f2f5f;
+            font-size: 12px;
+        }
+
+        .top-nav a,
+        .top-nav button,
+        .top-nav .nav-text {
+            color: inherit;
+            border: 0;
+            background: transparent;
+            font: inherit;
+            text-decoration: none;
+            padding: 0;
+        }
+
+        .top-nav button {
+            cursor: pointer;
+        }
+
+        .top-nav > span:not(.nav-text) {
+            width: 1px;
+            height: 21px;
+            background: #9aa7bd;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 38px;
+            height: 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            padding: 7px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 2px;
+            margin-bottom: 5px;
+            background: var(--occi-dark);
+        }
+
+        .menu-toggle span:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            visibility: hidden;
+            background: rgba(15, 23, 42, 0.35);
+            opacity: 0;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .menu-overlay.is-open {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .blue-strip {
+            height: 24px;
+            background: var(--occi-blue);
+            border-top: 1px solid #103c75;
+            border-bottom: 5px solid var(--occi-green);
+        }
+
+        .viewer-main {
+            flex: 1;
+            width: min(1100px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 34px;
+        }
+
+        .viewer-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .viewer-title h1 {
+            margin: 0;
+            color: var(--occi-dark);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .viewer-title p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .download-main {
+            display: none;
+            padding: 9px 14px;
+            border-radius: 4px;
+            background: var(--occi-blue);
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .document-list {
+            display: grid;
+            gap: 22px;
+        }
+
+        .document-section {
+            margin-bottom: 20px;
+        }
+
+        .document-section h1 {
+            margin: 0 0 12px;
+            color: black;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .document-section h1.certificate-heading {
+            color: #2a5491;
+        }
+
+        .document-card__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #f9fbfe;
+        }
+
+        .document-card__title {
+            margin: 0;
+            color: var(--occi-dark);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .document-card__meta {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .document-card__link {
+            flex: 0 0 auto;
+            color: var(--occi-blue);
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .document-frame {
+            display: block;
+            width: 80%;
+            max-width: 880px;
+            height: 865px;
+            max-height: calc((100vw - 32px) * 1.13);
+            /* margin: 0 auto; */
+            border: 0;
+            background: #eef2f7;
+            overflow: hidden;
+        }
+
+        .message {
+            padding: 34px 22px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .message strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--occi-dark);
+            font-size: 18px;
+        }
+
+        .footer {
+            margin-top: auto;
+            background: var(--occi-blue);
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .footer-inner {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .powered-by {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            white-space: nowrap;
+        }
+
+        .datapark-mark {
+            position: relative;
+            width: 44px;
+            height: 25px;
+        }
+
+        .datapark-mark span {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            opacity: 0.9;
+        }
+
+        .datapark-mark span:nth-child(1) {
+            left: 0;
+            background: #6ec441;
+        }
+
+        .datapark-mark span:nth-child(2) {
+            left: 10px;
+            background: #1fb377;
+        }
+
+        .datapark-mark span:nth-child(3) {
+            left: 20px;
+            background: #2a9fd8;
+        }
+
+        .datapark-text {
+            font-weight: 700;
+            line-height: 1.05;
+            text-transform: uppercase;
+        }
+
+        .datapark-text small {
+            display: block;
+            font-weight: 400;
+            text-transform: none;
+        }
+
+        @media (max-width: 760px) {
+            .header-inner {
+                height: 76px;
+                padding: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .top-nav {
+                position: fixed;
+                top: 0;
+                right: 0;
+                z-index: 30;
+                width: min(300px, 82vw);
+                height: 100vh;
+                padding: 24px;
+                align-items: stretch;
+                flex-direction: column;
+                gap: 0;
+                background: #fff;
+                box-shadow: -12px 0 30px rgba(15, 23, 42, 0.18);
+                transform: translateX(100%);
+                transition: transform 0.25s ease;
+            }
+
+            .top-nav.is-open {
+                transform: translateX(0);
+            }
+
+            .top-nav a,
+            .top-nav button,
+            .top-nav .nav-text {
+                display: block;
+                width: 100%;
+                padding: 14px 0;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .top-nav > span:not(.nav-text) {
+                display: none;
+            }
+
+            .viewer-title {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .document-frame {
+                width: 100%;
+                height: calc((100vw - 32px) * 1.4142);
+                max-height: none;
+            }
+
+            .footer-inner {
+                padding: 14px 0;
+                align-items: center;
+                flex-direction: column;
+            }
+            
+            .footer-inner div{
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-shell">
+        <header class="top-header">
+            <div class="header-inner">
+                <div class="brand" aria-label="Oman Chamber of Commerce and Industry">
+                    <img src="/assets/viewpagelogo.png" alt="OCCI Logo" class="brand-logo">
+                </div>
+                <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav class="top-nav" aria-label="Top navigation">
+                    <a href="/" data-i18n="home">omanchamber.com</a>
+                    <span></span>
+                    <span class="nav-text" data-i18n="contact">Contact Us</span>
+                    <span></span>
+                    <button type="button" lang="ar" data-language-toggle>العربية</button>
+                    <span></span>
+                    <a href="/login" data-i18n="login">Login</a>
+                </nav>
+            </div>
+            <div class="blue-strip"></div>
+        </header>
+        <div class="menu-overlay"></div>
+
+        <main class="viewer-main">
+            <section id="document-list" class="document-list" aria-live="polite">
+                <div class="message">
+                    <strong>Loading</strong>
+                    Please wait while the certificate documents are loaded.
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <div>
+                    &copy; Chamber of Commerce &amp; Industry, Sultanate of Oman |
+                    <a href="#">Privacy Policy</a> |
+                    <a href="#">Terms of use</a>
+                </div>
+                <div class="powered-by">
+                    <span>Powered by</span>
+                    <img src="/assets/omandataparklogo.png" alt="Oman Data Park" />
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const documentList = document.getElementById('document-list');
+        const nav = document.querySelector('.top-nav');
+        const menuToggle = document.querySelector('.menu-toggle');
+        const menuOverlay = document.querySelector('.menu-overlay');
+        const languageToggle = document.querySelector('[data-language-toggle]');
+        let currentLanguage = 'en';
+        const translations = {
+            en: {
+                home: 'omanchamber.com',
+                contact: 'Contact Us',
+                login: 'Login',
+                language: 'العربية',
+                certificateStatus: 'Certificate Status',
+                invoice: 'Invoice',
+                packageList: 'Package List',
+                missingDocument: 'Missing Document',
+                missingFile: heading => `${heading} file was not uploaded for this certificate.`,
+                missingNumber: 'Missing Certificate Number',
+                missingNumberText: 'Please scan a valid QR code or open a valid certificate link.',
+                notAvailable: 'Document Not Available'
+            },
+            ar: {
+                home: 'omanchamber.com',
+                contact: 'اتصل بنا',
+                login: 'تسجيل الدخول',
+                language: 'English',
+                certificateStatus: 'حالة الشهادة',
+                invoice: 'الفاتورة',
+                packageList: 'قائمة التعبئة',
+                missingDocument: 'المستند غير موجود',
+                missingFile: heading => `لم يتم رفع ملف ${heading} لهذه الشهادة.`,
+                missingNumber: 'رقم الشهادة غير موجود',
+                missingNumberText: 'يرجى مسح رمز QR صالح أو فتح رابط شهادة صالح.',
+                notAvailable: 'المستند غير متاح'
+            }
+        };
+
+        function t(key, ...args) {
+            const value = translations[currentLanguage][key];
+            return typeof value === 'function' ? value(...args) : value;
+        }
+
+        function closeMenu() {
+            nav.classList.remove('is-open');
+            menuOverlay.classList.remove('is-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleMenu() {
+            const isOpen = nav.classList.toggle('is-open');
+            menuOverlay.classList.toggle('is-open', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        function updateStaticText() {
+            document.documentElement.lang = currentLanguage;
+            document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                element.textContent = t(element.dataset.i18n);
+            });
+            languageToggle.textContent = t('language');
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+        nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+        languageToggle.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            updateStaticText();
+            loadDocuments();
+            closeMenu();
+        });
+
+        updateStaticText();
+
+        function getSerialNoFromUrl() {
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const viewIndex = pathParts.findIndex(part => part === 'view');
+            if (viewIndex !== -1 && pathParts[viewIndex + 1]) {
+                return decodeURIComponent(pathParts[viewIndex + 1]);
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            return params.get('serialNo') || params.get('cert') || '';
+        }
+
+        function isWordDocument(mimeType = '', url = '') {
+            return mimeType.includes('word') || /\.(doc|docx)$/i.test(url.split('?')[0]);
+        }
+
+        function isPdfDocument(mimeType = '', url = '') {
+            return mimeType.includes('pdf') || /\.pdf$/i.test(url.split(/[?#]/)[0]);
+        }
+
+        function addPdfViewerOptions(url) {
+            const absoluteUrl = new URL(url, window.location.origin);
+            absoluteUrl.hash = 'toolbar=0&navpanes=0&scrollbar=0&view=Fit';
+            return absoluteUrl.href;
+        }
+
+        function buildViewerUrl(file) {
+            const absoluteUrl = new URL(file.url, window.location.origin).href;
+
+            if (isWordDocument(file.mimeType, file.url)) {
+                return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(absoluteUrl)}`;
+            }
+
+            if (isPdfDocument(file.mimeType, file.url)) {
+                return addPdfViewerOptions(absoluteUrl);
+            }
+
+            return absoluteUrl;
+        }
+
+        function escapeHtml(value = '') {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[char]);
+        }
+
+        function renderMessage(title, text) {
+            documentList.innerHTML = `
+                <div class="message">
+                    <strong>${title}</strong>
+                    ${text}
+                </div>
+            `;
+        }
+
+        function renderDocumentCard(file, index) {
+            const title = file.title || file.originalName || `Supporting File ${index}`;
+            const viewerUrl = buildViewerUrl(file);
+            const directUrl = new URL(file.url, window.location.origin).href;
+            const meta = file.originalName && file.originalName !== title ? file.originalName : directUrl;
+            const safeTitle = escapeHtml(title);
+            const safeMeta = escapeHtml(meta);
+
+            return `
+                <article class="document-card">
+                    <iframe class="document-frame" src="${viewerUrl}" title="${safeTitle}" scrolling="no"></iframe>
+                </article>
+            `;
+        }
+
+        function renderDocumentSection(heading, file, index) {
+            if (!file?.url) {
+                return `
+                    <section class="document-section">
+                        <h1 class="${index === 0 ? 'certificate-heading' : ''}">${escapeHtml(heading)}</h1>
+                        <div class="message">
+                            <strong>${escapeHtml(t('missingDocument'))}</strong>
+                            ${escapeHtml(t('missingFile', heading))}
+                        </div>
+                    </section>
+                `;
+            }
+
+            return `
+                <section class="document-section">
+                    <h1 class="${index === 0 ? 'certificate-heading' : ''}">${escapeHtml(heading)}</h1>
+                    ${renderDocumentCard({ ...file, title: heading }, index)}
+                </section>
+            `;
+        }
+
+        async function loadDocuments() {
+            const serialNo = getSerialNoFromUrl();
+            if (!serialNo) {
+                renderMessage(t('missingNumber'), t('missingNumberText'));
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/documents/verify/${encodeURIComponent(serialNo)}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.success || !data.valid) {
+                    throw new Error(data.error || 'Unable to verify this certificate.');
+                }
+
+                const documentData = data.document;
+                const attachments = documentData.attachments || [];
+                const invoiceFile = attachments.find(attachment => attachment.fieldName === 'SUPPORTING_FILE_1');
+                const packageListFile = attachments.find(attachment => attachment.fieldName === 'SUPPORTING_FILE_2');
+                const certificateFile = {
+                    originalName: `Certificate No: ${documentData.serialNo}`,
+                    url: documentData.pdfUrl,
+                    mimeType: 'application/pdf'
+                };
+
+                documentList.innerHTML = [
+                    renderDocumentSection(t('certificateStatus'), certificateFile, 0),
+                    renderDocumentSection(t('invoice'), invoiceFile, 1),
+                    renderDocumentSection(t('packageList'), packageListFile, 2)
+                ].join('');
+            } catch (error) {
+                console.error('Document verification failed:', error);
+                renderMessage(t('notAvailable'), error.message);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadDocuments);
+    </script>
+</body>
+</html>

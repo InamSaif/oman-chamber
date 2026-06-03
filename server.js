@@ -23,6 +23,7 @@ app.use(cookieParser());
 // Serve static files
 app.use('/pdfs', express.static(path.join(__dirname, 'storage')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Create necessary directories
 async function setupDirectories() {
@@ -196,6 +197,10 @@ app.get('/register', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/view/:serialNo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'view.html'));
 });
 
 // Start server

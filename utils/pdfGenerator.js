@@ -284,8 +284,10 @@ async function generateTempPDF(htmlContent, outputPath) {
             waitUntil: ['load', 'domcontentloaded', 'networkidle0']
         });
         
-        // Wait for images to load (especially the QR code)
-        await page.waitForSelector('#qr-code-img', { timeout: 5000 });
+        // Wait for images to load (especially the QR code when the template has one)
+        if (await page.$('#qr-code-img')) {
+            await page.waitForSelector('#qr-code-img', { timeout: 5000 });
+        }
         
         // Wait for all images to load completely
         await page.evaluate(() => {
@@ -345,7 +347,9 @@ async function generatePortClearancePDF(formData, baseUrl) {
 
     // Generate unique filename
     const uniqueId = uuidv4();
-    const filename = `chamber-cert-${formData.CERTIFICATE_NUMBER || uniqueId}.pdf`;
+    const serialNo = formData.SERIAL_NO || formData.CERTIFICATE_NUMBER || uniqueId;
+    const safeSerialNo = String(serialNo).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filename = `chamber-cert-${safeSerialNo}.pdf`;
     const finalPdfPath = path.join(storageDir, filename);
     const qrCodePath = path.join(tempDir, `qr-${uniqueId}.png`);
 
@@ -355,10 +359,11 @@ async function generatePortClearancePDF(formData, baseUrl) {
 
         // Step 2: Generate PDF URL (where the final PDF will be hosted)
         const pdfUrl = `${baseUrl}/pdfs/${filename}`;
+        const viewUrl = `${baseUrl}/view/${encodeURIComponent(serialNo)}`;
 
         // Step 3: Generate QR code as file
-        await generateQRCode(pdfUrl, qrCodePath);
-        console.log('QR Code generated for URL:', pdfUrl);
+        await generateQRCode(viewUrl, qrCodePath);
+        console.log('QR Code generated for URL:', viewUrl);
 
         // Step 4: Read QR as base64
         const qrBuffer = await fs.readFile(qrCodePath);
@@ -408,6 +413,7 @@ async function generatePortClearancePDF(formData, baseUrl) {
         return {
             filename: filename,
             pdfUrl: pdfUrl,
+            viewUrl: viewUrl,
             qrCodeUrl: qrBase64,
             filePath: finalPdfPath
         };

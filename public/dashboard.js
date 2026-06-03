@@ -19,6 +19,12 @@ function getHeaders() {
     };
 }
 
+function getAuthHeaders() {
+    return {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    };
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async () => {
     if (!checkAuth()) return;
@@ -190,13 +196,23 @@ document.getElementById('documentForm').addEventListener('submit', async (e) => 
             formData.PRODUCTS = products;
         }
         
+        const requestBody = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            requestBody.append(key, Array.isArray(value) ? JSON.stringify(value) : value);
+        });
+
+        const supportingFile1 = document.getElementById('SUPPORTING_FILE_1')?.files?.[0];
+        const supportingFile2 = document.getElementById('SUPPORTING_FILE_2')?.files?.[0];
+        if (supportingFile1) requestBody.append('SUPPORTING_FILE_1', supportingFile1);
+        if (supportingFile2) requestBody.append('SUPPORTING_FILE_2', supportingFile2);
+
         const url = docId ? `${API_BASE}/api/documents/${docId}` : `${API_BASE}/api/documents`;
         const method = docId ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
             method,
-            headers: getHeaders(),
-            body: JSON.stringify(formData),
+            headers: getAuthHeaders(),
+            body: requestBody,
             credentials: 'include'
         });
         

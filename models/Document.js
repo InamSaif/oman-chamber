@@ -23,6 +23,15 @@ const documentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    attachments: [{
+        fieldName: String,
+        title: String,
+        originalName: String,
+        filename: String,
+        url: String,
+        mimeType: String,
+        size: Number
+    }],
     // Form Data - Using Mixed type to allow any fields
     formData: {
         type: mongoose.Schema.Types.Mixed,
