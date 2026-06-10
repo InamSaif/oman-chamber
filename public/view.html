@@ -553,6 +553,17 @@
             return params.get('serialNo') || params.get('cert') || '';
         }
 
+        function resolveFileUrl(url = '') {
+            if (!url) return '';
+
+            const resolved = new URL(url, window.location.origin);
+            if (window.location.protocol === 'https:' && resolved.protocol === 'http:') {
+                resolved.protocol = 'https:';
+            }
+
+            return resolved.href;
+        }
+
         function isWordDocument(mimeType = '', url = '') {
             return mimeType.includes('word') || /\.(doc|docx)$/i.test(url.split('?')[0]);
         }
@@ -562,13 +573,13 @@
         }
 
         function addPdfViewerOptions(url) {
-            const absoluteUrl = new URL(url, window.location.origin);
+            const absoluteUrl = new URL(resolveFileUrl(url));
             absoluteUrl.hash = 'toolbar=0&navpanes=0&scrollbar=0&view=Fit';
             return absoluteUrl.href;
         }
 
         function buildViewerUrl(file) {
-            const absoluteUrl = new URL(file.url, window.location.origin).href;
+            const absoluteUrl = resolveFileUrl(file.url);
 
             if (isWordDocument(file.mimeType, file.url)) {
                 return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(absoluteUrl)}`;
@@ -603,7 +614,7 @@
         function renderDocumentCard(file, index) {
             const title = file.title || file.originalName || `Supporting File ${index}`;
             const viewerUrl = buildViewerUrl(file);
-            const directUrl = new URL(file.url, window.location.origin).href;
+            const directUrl = resolveFileUrl(file.url);
             const meta = file.originalName && file.originalName !== title ? file.originalName : directUrl;
             const safeTitle = escapeHtml(title);
             const safeMeta = escapeHtml(meta);
