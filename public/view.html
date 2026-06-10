@@ -252,16 +252,44 @@
             text-decoration: none;
         }
 
-        .document-frame {
+        .document-viewer {
             display: block;
             width: 80%;
             max-width: 880px;
+            background: #fff;
+        }
+
+        .document-frame {
+            display: block;
+            width: 100%;
             height: 865px;
             max-height: calc((100vw - 32px) * 1.13);
-            /* margin: 0 auto; */
             border: 0;
             background: #eef2f7;
-            overflow: hidden;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            line-height: 0;
+        }
+
+        .pdf-page-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .pdf-page-image + .pdf-page-image {
+            margin-top: 10px;
+        }
+
+        .pdf-loading {
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            background: #eef2f7;
         }
 
         .message {
@@ -398,10 +426,25 @@
                 flex-direction: column;
             }
 
-            .document-frame {
+            .document-viewer {
                 width: 100%;
-                height: calc((100vw - 32px) * 1.4142);
-                max-height: none;
+            }
+
+            .document-section h1 {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+
+            .viewer-main {
+                padding: 16px 0 24px;
+            }
+
+            .document-list {
+                gap: 14px;
+            }
+
+            .document-section {
+                margin-bottom: 10px;
             }
 
             .footer-inner {
@@ -574,7 +617,7 @@
 
         function addPdfViewerOptions(url) {
             const absoluteUrl = new URL(resolveFileUrl(url));
-            absoluteUrl.hash = 'toolbar=0&navpanes=0&scrollbar=0&view=Fit';
+            absoluteUrl.hash = 'toolbar=0&navpanes=0&scrollbar=0&view=FitH';
             return absoluteUrl.href;
         }
 
@@ -585,11 +628,98 @@
                 return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(absoluteUrl)}`;
             }
 
-            if (isPdfDocument(file.mimeType, file.url)) {
-                return addPdfViewerOptions(absoluteUrl);
+            return absoluteUrl;
+        }
+
+        function isMobileViewer() {
+            return window.matchMedia('(max-width: 760px)').matches;
+        }
+
+        let pdfJsLoadingPromise = null;
+
+        function loadPdfJs() {
+            if (window.pdfjsLib) {
+                return Promise.resolve(window.pdfjsLib);
             }
 
-            return absoluteUrl;
+            if (!pdfJsLoadingPromise) {
+                pdfJsLoadingPromise = new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                    script.onload = () => {
+                        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                        resolve(window.pdfjsLib);
+                    };
+                    script.onerror = () => reject(new Error('Failed to load PDF viewer'));
+                    document.head.appendChild(script);
+                });
+            }
+
+            return pdfJsLoadingPromise;
+        }
+
+        function getFitScale(pageWidth, pageHeight, maxWidth, maxHeight) {
+            return Math.min(maxWidth / pageWidth, maxHeight / pageHeight);
+        }
+
+        async function renderPdfViewer(container, url) {
+            const pdfjsLib = await loadPdfJs();
+            const pdf = await pdfjsLib.getDocument(resolveFileUrl(url)).promise;
+
+            container.innerHTML = '';
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            const maxWidth = container.clientWidth || window.innerWidth - 32;
+            const viewerTop = container.getBoundingClientRect().top;
+            const maxHeight = Math.max(window.innerHeight - viewerTop - 8, 180);
+
+            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+                const page = await pdf.getPage(pageNumber);
+                const baseViewport = page.getViewport({ scale: 1 });
+                const scale = getFitScale(
+                    baseViewport.width,
+                    baseViewport.height,
+                    maxWidth,
+                    maxHeight
+                );
+                const viewport = page.getViewport({ scale });
+                const outputScale = window.devicePixelRatio || 1;
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+
+                const context = canvas.getContext('2d');
+                context.setTransform(outputScale, 0, 0, outputScale, 0, 0);
+                await page.render({ canvasContext: context, viewport }).promise;
+
+                const image = document.createElement('img');
+                image.className = 'pdf-page-image';
+                image.alt = `Page ${pageNumber}`;
+                image.width = Math.round(viewport.width);
+                image.height = Math.round(viewport.height);
+                image.src = canvas.toDataURL('image/png');
+                container.appendChild(image);
+            }
+        }
+
+        async function mountPdfViewers() {
+            const viewers = document.querySelectorAll('.pdf-viewer[data-pdf-url]');
+
+            await Promise.all([...viewers].map(async viewer => {
+                try {
+                    await renderPdfViewer(viewer, viewer.dataset.pdfUrl);
+                } catch (error) {
+                    console.error('PDF render failed:', error);
+                    const openUrl = escapeHtml(resolveFileUrl(viewer.dataset.pdfUrl));
+                    viewer.innerHTML = `
+                        <div class="pdf-loading">
+                            Unable to preview this document.
+                            <a href="${openUrl}" target="_blank" rel="noopener">Open PDF</a>
+                        </div>
+                    `;
+                }
+            }));
         }
 
         function escapeHtml(value = '') {
@@ -613,15 +743,29 @@
 
         function renderDocumentCard(file, index) {
             const title = file.title || file.originalName || `Supporting File ${index}`;
-            const viewerUrl = buildViewerUrl(file);
             const directUrl = resolveFileUrl(file.url);
-            const meta = file.originalName && file.originalName !== title ? file.originalName : directUrl;
             const safeTitle = escapeHtml(title);
-            const safeMeta = escapeHtml(meta);
+            const safeUrl = escapeHtml(directUrl);
+
+            if (isPdfDocument(file.mimeType, file.url) && isMobileViewer()) {
+                return `
+                    <article class="document-card">
+                        <div class="document-viewer pdf-viewer" data-pdf-url="${safeUrl}" aria-label="${safeTitle}">
+                            <div class="pdf-loading">Loading document...</div>
+                        </div>
+                    </article>
+                `;
+            }
+
+            const viewerUrl = isPdfDocument(file.mimeType, file.url)
+                ? addPdfViewerOptions(directUrl)
+                : buildViewerUrl(file);
 
             return `
                 <article class="document-card">
-                    <iframe class="document-frame" src="${viewerUrl}" title="${safeTitle}" scrolling="no"></iframe>
+                    <div class="document-viewer">
+                        <iframe class="document-frame" src="${viewerUrl}" title="${safeTitle}" scrolling="no"></iframe>
+                    </div>
                 </article>
             `;
         }
@@ -677,6 +821,10 @@
                     renderDocumentSection(t('invoice'), invoiceFile, 1),
                     renderDocumentSection(t('packageList'), packageListFile, 2)
                 ].join('');
+
+                if (isMobileViewer()) {
+                    await mountPdfViewers();
+                }
             } catch (error) {
                 console.error('Document verification failed:', error);
                 renderMessage(t('notAvailable'), error.message);
