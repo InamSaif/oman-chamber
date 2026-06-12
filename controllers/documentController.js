@@ -44,12 +44,14 @@ function hasRequiredDocumentUploads(files = {}) {
 }
 
 function getRequestBaseUrl(req) {
-    return `${req.protocol}://${req.get('host')}`;
+    const forwardedProto = req.get('x-forwarded-proto');
+    const protocol = forwardedProto ? forwardedProto.split(',')[0].trim() : req.protocol;
+    return `${protocol}://${req.get('host')}`;
 }
 
 function buildPublicFileUrl(req, filename) {
     if (!filename) return '';
-    return `${getRequestBaseUrl(req)}/pdfs/${filename}`;
+    return `/pdfs/${filename}`;
 }
 
 function normalizeAttachmentUrls(req, attachments = []) {
