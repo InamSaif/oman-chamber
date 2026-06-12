@@ -162,12 +162,12 @@ exports.createDocument = async (req, res) => {
             });
         }
 
-        if (!hasRequiredDocumentUploads(req.files)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invoice file and Package List file are required'
-            });
-        }
+        // if (!hasRequiredDocumentUploads(req.files)) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         error: 'Invoice file and Package List file are required'
+        //     });
+        // }
 
         console.log('Generating Port Clearance PDF for user:', req.user.id);
         console.log('Form Data:', formData);
