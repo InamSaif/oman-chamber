@@ -201,6 +201,10 @@ app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+app.get('/seal-stamp', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'seal-stamp.html'));
+});
+
 app.get('/view/:serialNo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'view.html'));
 });
