@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs').promises;
+const { protectPage } = require('./middleware/auth');
 
 require('dotenv').config();
 
@@ -24,6 +25,9 @@ app.use(cookieParser());
 
 // Serve static files
 app.use('/pdfs', express.static(path.join(__dirname, 'storage')));
+app.get('/public/seal-stamp.html', protectPage, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'seal-stamp.html'));
+});
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
@@ -201,7 +205,7 @@ app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-app.get('/seal-stamp', (req, res) => {
+app.get('/seal-stamp', protectPage, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'seal-stamp.html'));
 });
 

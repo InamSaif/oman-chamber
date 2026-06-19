@@ -1,51 +1,58 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const authenticate = async (req) => {
+    let token;
+
+    if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) return null;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production');
+        return await User.findById(decoded.id);
+    } catch (error) {
+        return null;
+    }
+};
+
 // Protect routes - require authentication
 exports.protect = async (req, res, next) => {
     try {
-        let token;
+        req.user = await authenticate(req);
 
-        // Check for token in cookie or Authorization header
-        if (req.cookies && req.cookies.token) {
-            token = req.cookies.token;
-        } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            token = req.headers.authorization.split(' ')[1];
-        }
-
-        if (!token) {
+        if (!req.user) {
             return res.status(401).json({
                 success: false,
                 error: 'Not authorized to access this route'
             });
         }
 
-        try {
-            // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production');
-            
-            // Get user from token
-            req.user = await User.findById(decoded.id);
-            
-            if (!req.user) {
-                return res.status(401).json({
-                    success: false,
-                    error: 'User not found'
-                });
-            }
-
-            next();
-        } catch (error) {
-            return res.status(401).json({
-                success: false,
-                error: 'Not authorized to access this route'
-            });
-        }
+        next();
     } catch (error) {
         return res.status(500).json({
             success: false,
             error: 'Server error'
         });
+    }
+};
+
+// Protect browser pages and send unauthenticated visitors to login.
+exports.protectPage = async (req, res, next) => {
+    try {
+        req.user = await authenticate(req);
+
+        if (!req.user) {
+            return res.redirect('/login');
+        }
+
+        next();
+    } catch (error) {
+        return res.redirect('/login');
     }
 };
 
@@ -93,4 +100,3 @@ exports.sendTokenResponse = (user, statusCode, res) => {
             }
         });
 };
-
